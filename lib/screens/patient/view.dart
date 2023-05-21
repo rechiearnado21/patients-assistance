@@ -2,9 +2,20 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
-import 'package:nurse_assistance/screens/dashboard/view_order.dart';
+import 'package:get/get.dart';
+import 'package:nurse_assistance/routes/routes.dart';
+import 'controller.dart';
 
-import 'order_form.dart';
+class PatientScreen extends GetView<PatientController> {
+  const PatientScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Colors.transparent,
+    );
+  }
+}
 
 class PatientForm extends StatefulWidget {
   const PatientForm({super.key});
@@ -91,8 +102,6 @@ class _PatientFormState extends State<PatientForm> {
         setState(() {
           dateTime.text = date.toString();
         });
-        // dateTime = DateFormat('dd-MMM-yyyy - HH:mm').format(selectdate);
-        print(selectdate);
       },
     );
   }
@@ -306,12 +315,7 @@ class _PatientFormState extends State<PatientForm> {
                         horizontal: 10, vertical: 10),
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => OrderForm(
-                                  onSubmit: (data) {
-                                    getSearchValue(data);
-                                  },
-                                )));
+                        Get.toNamed(AppRoutes.order);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -336,10 +340,8 @@ class _PatientFormState extends State<PatientForm> {
                     itemBuilder: (context, i) {
                       return InkWell(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ViewOrder(
-                                    doctorsData: doctorsOrder[i],
-                                  )));
+                          Get.toNamed(AppRoutes.viewOrder,
+                              arguments: doctorsOrder[i]);
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),

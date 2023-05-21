@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../dialogs.dart';
 import '../../http_request.dart';
 import '../../messages.dart';
@@ -292,6 +293,7 @@ class _LoginBodyScreenState extends State<LoginBodyScreen>
   }
 
   Future<void> login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     const CustomDialog(isCancel: false).loadingDialog();
 
     Variable.checkInternet((hasInternet) async {
@@ -311,8 +313,14 @@ class _LoginBodyScreenState extends State<LoginBodyScreen>
                 .defaultDialog();
           } else if (res["rows"].isNotEmpty) {
             Get.back();
+            prefs.setString("email", _userName.text);
+            prefs.setString("password", _password.text);
             Variable.userInfo = res["rows"][0];
-            //Get.offAndToNamed(AppRoutes.)
+            if (Variable.userInfo["role_id"] == 1) {
+              Get.offAndToNamed(AppRoutes.doctorDashboard);
+            } else {
+              Get.offAndToNamed(AppRoutes.landing);
+            }
           } else {
             Get.back();
 

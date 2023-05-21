@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../api_keys.dart';
 import '../../dialogs.dart';
 import '../../http_request.dart';
 import '../../messages.dart';
@@ -20,12 +19,12 @@ class SplashController extends GetxController
 
   Future<void> runMyApplication() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String userName = prefs.getString("username") ?? "";
+    final String email = prefs.getString("email") ?? "";
     final String password = prefs.getString("password") ?? "";
 
-    if (userName.isEmpty && password.isEmpty) {
+    if (email.isEmpty && password.isEmpty) {
       Timer(const Duration(seconds: 3), () {
-        Get.toNamed(AppRoutes.home);
+        Get.toNamed(AppRoutes.login);
       });
 
       return;
@@ -37,17 +36,27 @@ class SplashController extends GetxController
         return;
       }
 
-      HttpRequest(parameters: {'username': userName, 'password': password})
+      Map<String, dynamic> parameters = {
+        "email": email,
+        "password": password,
+      };
+
+      HttpRequest(parameters: {"sqlCode": "T1341", "parameters": parameters})
           .post()
-          .then((value) async {
-        if (value == null) {
+          .then((res) async {
+        if (res == null) {
           labas();
           return;
-        } else if (value["items"].isNotEmpty) {
-          Variable.userInfo = value["items"][0];
-          Get.offAndToNamed(AppRoutes.login);
+        } else if (res["rows"].isNotEmpty) {
+          Get.back();
+          Variable.userInfo = res["rows"][0];
+          if (Variable.userInfo["role_id"] == 1) {
+            Get.offAndToNamed(AppRoutes.doctorDashboard);
+          } else {
+            Get.offAndToNamed(AppRoutes.landing);
+          }
         } else {
-          Get.offAndToNamed(AppRoutes.deviceReg);
+          Get.offAndToNamed(AppRoutes.login);
         }
       });
     });

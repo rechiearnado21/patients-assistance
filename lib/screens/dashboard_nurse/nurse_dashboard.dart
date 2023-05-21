@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:page_transition/page_transition.dart';
 
-import 'patient_details.dart';
+import '../patient_details/patient_details.dart';
 
 class NurseDashboard extends StatefulWidget {
   const NurseDashboard({super.key});

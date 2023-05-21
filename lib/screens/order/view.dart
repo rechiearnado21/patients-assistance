@@ -4,8 +4,21 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
-import 'package:nurse_assistance/widgets/custom_btn.dart';
-import 'package:nurse_assistance/widgets/custom_loader.dart';
+import 'package:get/get.dart';
+import 'package:nurse_assistance/dialogs.dart';
+import '../../widgets/widgets.dart';
+import 'controller.dart';
+
+class OrderScreen extends GetView<OrderController> {
+  const OrderScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return OrderForm(
+      onSubmit: (value) {},
+    );
+  }
+}
 
 class OrderForm extends StatefulWidget {
   const OrderForm({super.key, required this.onSubmit});
@@ -62,14 +75,12 @@ class _OrderFormState extends State<OrderForm> {
         setState(() {
           dateTime.text = date.toString();
         });
-        print(selectdate);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
       child: Scaffold(
@@ -195,7 +206,7 @@ class _OrderFormState extends State<OrderForm> {
                           backgroundColor: Colors.purple,
                           isDisabled: false,
                           onTap: () async {
-                            CustomModal(context: context).loader();
+                            const CustomDialog(isCancel: false).loadingDialog();
                             widget.onSubmit({
                               'date': dateTime.text,
                               "order": order.text,

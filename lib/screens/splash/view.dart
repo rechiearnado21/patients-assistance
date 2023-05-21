@@ -11,7 +11,7 @@ class SplashScreen extends GetView<SplashController> {
 
   @override
   Widget build(BuildContext context) {
-    controller.runTest();
+    controller.runMyApplication();
     return Scaffold(
         body: Scaffold(
       backgroundColor: Colors.transparent,

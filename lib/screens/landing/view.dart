@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:molten_navigationbar_flutter/molten_navigationbar_flutter.dart';
-
 import '../dashboard_nurse/nurse_dashboard.dart';
+import 'controller.dart';
 
-class LandingPage extends StatefulWidget {
-  const LandingPage({super.key});
+class LandingScreen extends GetView<LandingController> {
+  const LandingScreen({super.key});
 
   @override
-  State<LandingPage> createState() => _LandingPageState();
+  Widget build(BuildContext context) {
+    return const LandingBodyScreen();
+  }
 }
 
-class _LandingPageState extends State<LandingPage> {
+class LandingBodyScreen extends StatefulWidget {
+  const LandingBodyScreen({super.key});
+
+  @override
+  State<LandingBodyScreen> createState() => _LandingBodyScreenState();
+}
+
+class _LandingBodyScreenState extends State<LandingBodyScreen> {
   int pageIndex = 0;
 
   /// widget list
@@ -47,18 +57,18 @@ class _LandingPageState extends State<LandingPage> {
         // ansert as many tabs as you like
         tabs: [
           MoltenTab(
-            icon: Icon(Icons.task_outlined),
-            title: Text('Chart'),
+            icon: const Icon(Icons.task_outlined),
+            title: const Text('Chart'),
             // selectedColor: Colors.yellow,
           ),
           MoltenTab(
-            icon: Icon(Icons.home),
-            title: Text('History'),
+            icon: const Icon(Icons.home),
+            title: const Text('History'),
             // selectedColor: Colors.yellow,
           ),
           MoltenTab(
-            icon: Icon(Icons.person),
-            title: Text('Account'),
+            icon: const Icon(Icons.person),
+            title: const Text('Account'),
             // selectedColor: Colors.yellow,
           ),
         ],

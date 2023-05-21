@@ -1,9 +1,22 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:get/get.dart';
+import 'package:nurse_assistance/http_request.dart';
+import 'package:nurse_assistance/routes/routes.dart';
+import 'package:nurse_assistance/variables.dart';
+import '../../dialogs.dart';
+import '../../messages.dart';
+import 'controller.dart';
 
-import 'patient_form.dart';
+class DoctorDashboardScreen extends GetView<DoctorDashboardController> {
+  const DoctorDashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const DoctorDashboard();
+  }
+}
 
 class DoctorDashboard extends StatefulWidget {
   const DoctorDashboard({super.key});
@@ -13,6 +26,56 @@ class DoctorDashboard extends StatefulWidget {
 }
 
 class _DoctorDashboardState extends State<DoctorDashboard> {
+  bool isLoading = true;
+  List<dynamic> data = [];
+  String filter = '';
+  TextEditingController controller = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
+  Future<void> getData() async {
+    Variable.checkInternet((hasInternet) {
+      if (!hasInternet) {
+        setState(() {
+          isLoading = false;
+        });
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      } else {
+        Map<String, dynamic> parameters = {
+          "department_id": Variable.userInfo["department_id"],
+        };
+        HttpRequest(parameters: {"sqlCode": "T1342", "parameters": parameters})
+            .post()
+            .then((res) {
+          if (res == null) {
+            setState(() {
+              isLoading = false;
+            });
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else {
+            setState(() {
+              data = res["rows"];
+              isLoading = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  Future _refresh() async => setState(() {
+        isLoading = true;
+        getData();
+      });
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -70,9 +133,9 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "Addrian M. Mamar",
-                                  style: TextStyle(
+                                Text(
+                                  Variable.userInfo["full_name"],
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 20,
@@ -115,7 +178,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10.0, vertical: 10),
                       child: TextField(
-                          autofocus: true,
+                          focusNode: searchFocusNode,
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
@@ -132,8 +195,28 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 borderSide: BorderSide.none),
                             contentPadding: const EdgeInsets.only(left: 5),
                             hintStyle: const TextStyle(color: Colors.black54),
+                            suffixIcon: InkWell(
+                              onTap: filter.isEmpty
+                                  ? () {
+                                      searchFocusNode.requestFocus();
+                                    }
+                                  : () {
+                                      controller.clear();
+                                      setState(() {
+                                        filter = '';
+                                      });
+                                      FocusScope.of(context)
+                                          .requestFocus(FocusNode());
+                                    },
+                              child: filter.isEmpty
+                                  ? const Icon(Icons.search)
+                                  : const Icon(Icons.close),
+                            ),
                           ),
-                          onChanged: (text) {
+                          onChanged: (value) {
+                            setState(() {
+                              filter = value;
+                            });
                             // text = text.toLowerCase();
                             // setState(() {
                             //   ctr = 0;
@@ -177,11 +260,31 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                    itemCount: 5,
-                    itemBuilder: (BuildContext context, int index) {
-                      return lamingaNurse(size);
-                    }),
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor),
+                      )
+                    : !isLoading && data.isEmpty
+                        ? GestureDetector(
+                            onTap: _refresh,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Center(
+                                  child: Text('No data found! Tap to refresh')),
+                            ))
+                        : StretchingOverscrollIndicator(
+                            axisDirection: AxisDirection.down,
+                            child: RefreshIndicator(
+                              onRefresh: _refresh,
+                              child: ListView.builder(
+                                  itemCount: data.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return lamingaNurse(data[index]);
+                                  }),
+                            ),
+                          ),
               ),
             ],
           ),
@@ -190,11 +293,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     );
   }
 
-  Widget lamingaNurse(size) {
+  Widget lamingaNurse(dynamic data) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
-        width: size.width,
+        width: MediaQuery.of(context).size.width,
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -231,9 +334,9 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           Container(
                             height: 10,
                           ),
-                          const AutoSizeText(
-                            "Rechie R. Arnado",
-                            style: TextStyle(
+                          AutoSizeText(
+                            data["full_name"],
+                            style: const TextStyle(
                               color: Color(0xFF255880),
                               fontWeight: FontWeight.w500,
                               fontSize: 15,
@@ -286,26 +389,20 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
                                 color: Colors.green,
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
                                 onPressed: () async {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.leftToRight,
-                                      duration:
-                                          const Duration(milliseconds: 400),
-                                      alignment: Alignment.centerLeft,
-                                      child: const PatientForm(),
-                                    ),
-                                  );
+                                  Get.toNamed(AppRoutes.patient);
                                 },
-                                child: const Text(
-                                  "   Assign Patient   ",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: 1,
-                                      fontSize: 13),
+                                child: const Center(
+                                  child: Text(
+                                    "Assign Patient",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: 1,
+                                        fontSize: 13),
+                                  ),
                                 ),
                               ),
                             ),

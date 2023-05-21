@@ -8,12 +8,12 @@ class AppRoutes {
   static const login = '/login';
   static const scanner = '/scanner';
   static const forgotPassword = '/forgot_password';
-  static const ticketing = '/ticketing';
-  static const trip = '/trip';
+  static const patient = '/patient';
+  static const viewOrder = '/view_order';
   static const settings = '/settings';
-  static const ticket = '/ticket';
-  static const vehicleReg = '/vehicle_reg';
+  static const order = '/order';
+  static const doctorDashboard = '/doctor_dashboard';
   static const profile = '/profile';
-  static const deviceReg = '/device_reg';
+  static const landing = '/landing';
   static const signup = '/signup';
 }
