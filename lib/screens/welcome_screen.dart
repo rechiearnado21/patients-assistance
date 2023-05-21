@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'login/login_screen.dart';
-import 'signup/signup.dart';
-
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
@@ -77,8 +74,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             padding: const EdgeInsets.all(10),
                             onPressed: () async {
                               // showReceipt();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()));
+                              // Navigator.of(context).push(MaterialPageRoute(
+                              //     builder: (context) => const LoginScreen()));
                             },
                             child: const Text(
                               "Login",
@@ -109,8 +106,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             color: Colors.green,
                             padding: const EdgeInsets.all(10),
                             onPressed: () async {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const Signup()));
+                              // Navigator.of(context).push(MaterialPageRoute(
+                              //     builder: (context) => const Signup()));
                               // Navigator.push(
                               //   context,
                               //   PageTransition(

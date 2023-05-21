@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../landing/landing.dart';
-import '../login/login_screen.dart';
 
 class MainLandingScreen extends StatefulWidget {
   const MainLandingScreen({super.key});
@@ -77,8 +76,8 @@ class _MainLandingScreenState extends State<MainLandingScreen> {
                             padding: const EdgeInsets.all(10),
                             onPressed: () async {
                               // showReceipt();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()));
+                              // Navigator.of(context).push(MaterialPageRoute(
+                              //     builder: (context) => const LoginScreen()));
                             },
                             child: const Text(
                               "Login",

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'screens/welcome_screen.dart';
+import 'package:get/get.dart';
+import 'package:nurse_assistance/routes/page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,30 +10,23 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final navigatorKey = GlobalKey<NavigatorState>();
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-      child: MaterialApp(
-        title: 'Nurse',
-        navigatorKey: navigatorKey,
-        debugShowCheckedModeBanner: false,
-        color: Colors.blue,
-        theme: ThemeData(
-          //    timePickerTheme: timePickerTheme,
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'LuvFare',
+      theme: ThemeData(
+          primarySwatch: Colors.blue,
+          primaryColor: Colors.green,
+          primaryColorLight: const Color(0xFF4466a0),
           scaffoldBackgroundColor: Colors.white,
-          brightness: Brightness.light,
-          iconTheme: IconThemeData(color: Colors.grey.shade600),
-        ),
-        home: const WelcomeScreen(),
-      ),
+          bottomSheetTheme:
+              const BottomSheetThemeData(backgroundColor: Colors.white),
+          iconTheme: IconThemeData(color: Colors.grey.shade600)),
+      initialRoute: AppPages.initial,
+      getPages: AppPages.routes,
     );
   }
 }

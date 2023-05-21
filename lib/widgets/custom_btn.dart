@@ -39,7 +39,9 @@ class PrimaryButton extends StatelessWidget {
               height: height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(borderRadius ?? 30),
-                color: Colors.green,
+                color: isDisabled
+                    ? backgroundColor.withOpacity(0.5)
+                    : backgroundColor,
               ),
               child: Center(
                 child: AutoSizeText(
