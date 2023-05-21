@@ -179,21 +179,15 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           horizontal: 10.0, vertical: 10),
                       child: TextField(
                           focusNode: searchFocusNode,
+                          controller: controller,
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
-                            prefixIcon: IconButton(
-                              icon: const Icon(Icons.search),
-                              color: Colors.black54,
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
                             hintText: 'Search',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide.none),
-                            contentPadding: const EdgeInsets.only(left: 5),
+                            contentPadding: const EdgeInsets.only(left: 20),
                             hintStyle: const TextStyle(color: Colors.black54),
                             suffixIcon: InkWell(
                               onTap: filter.isEmpty
@@ -281,7 +275,17 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                   itemCount: data.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return lamingaNurse(data[index]);
+                                    if (filter.isEmpty) {
+                                      return lamingaNurse(data[index]);
+                                    } else {
+                                      if (data[index]['full_name']
+                                          .toLowerCase()
+                                          .contains(filter.toLowerCase())) {
+                                        return lamingaNurse(data[index]);
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    }
                                   }),
                             ),
                           ),
