@@ -1,11 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nurse_assistance/dashboard/doctor_dashboard.dart';
 import 'package:nurse_assistance/widgets/custom_btn.dart';
 import 'package:nurse_assistance/widgets/custom_textformfield.dart';
 import 'package:nurse_assistance/widgets/slide_fade_transition.dart';
 import 'package:page_transition/page_transition.dart';
+
+import '../dashboard/doctor_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

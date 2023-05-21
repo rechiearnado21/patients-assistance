@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:molten_navigationbar_flutter/molten_navigationbar_flutter.dart';
-import 'package:nurse_assistance/dashboard_nurse/nurse_dashboard.dart';
+
+import '../dashboard_nurse/nurse_dashboard.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});

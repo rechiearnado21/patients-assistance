@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nurse_assistance/main_landing/main_landing_screen.dart';
-import 'package:nurse_assistance/welcome_screen.dart';
+
+import 'screens/welcome_screen.dart';
 
 void main() {
   runApp(const MyApp());

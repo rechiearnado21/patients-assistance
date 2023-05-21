@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:nurse_assistance/dashboard/patient_form.dart';
-import 'package:nurse_assistance/landing/landing.dart';
-import 'package:nurse_assistance/login/login_screen.dart';
-import 'package:page_transition/page_transition.dart';
 
-class MainLandingScreen extends StatefulWidget {
-  const MainLandingScreen({super.key});
+import 'login/login_screen.dart';
+import 'signup/signup.dart';
+
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
 
   @override
-  State<MainLandingScreen> createState() => _MainLandingScreenState();
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _MainLandingScreenState extends State<MainLandingScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -40,7 +39,7 @@ class _MainLandingScreenState extends State<MainLandingScreen> {
                     ),
                     const Center(
                       child: Text(
-                        "Welcome Nurse",
+                        "Welcome!",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
@@ -52,10 +51,11 @@ class _MainLandingScreenState extends State<MainLandingScreen> {
                     ),
                     const Center(
                       child: Text(
-                        "We care your health",
+                        "Manage your appointments",
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ),
@@ -109,17 +109,26 @@ class _MainLandingScreenState extends State<MainLandingScreen> {
                             color: Colors.green,
                             padding: const EdgeInsets.all(10),
                             onPressed: () async {
-                              // Navigator.of(context).push(MaterialPageRoute(
-                              //     builder: (context) => const Signup()));
-                              Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.leftToRight,
-                                  duration: const Duration(milliseconds: 400),
-                                  alignment: Alignment.centerLeft,
-                                  child: const LandingPage(),
-                                ),
-                              );
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const Signup()));
+                              // Navigator.push(
+                              //   context,
+                              //   PageTransition(
+                              //     type: PageTransitionType.leftToRight,
+                              //     duration: const Duration(milliseconds: 400),
+                              //     alignment: Alignment.centerLeft,
+                              //     child: const LandingPage(),
+                              //   ),
+                              // );
+                              // Navigator.push(
+                              //   context,
+                              //   PageTransition(
+                              //     type: PageTransitionType.leftToRight,
+                              //     duration: const Duration(milliseconds: 400),
+                              //     alignment: Alignment.centerLeft,
+                              //     child: const PatientForm(),
+                              //   ),
+                              // );
                             },
                             child: const Text(
                               "Register",

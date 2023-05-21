@@ -1,17 +1,18 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nurse_assistance/dashboard/patient_form.dart';
 import 'package:page_transition/page_transition.dart';
 
-class DoctorDashboard extends StatefulWidget {
-  const DoctorDashboard({super.key});
+import 'patient_details.dart';
+
+class NurseDashboard extends StatefulWidget {
+  const NurseDashboard({super.key});
 
   @override
-  State<DoctorDashboard> createState() => _DoctorDashboardState();
+  State<NurseDashboard> createState() => _NurseDashboardState();
 }
 
-class _DoctorDashboardState extends State<DoctorDashboard> {
+class _NurseDashboardState extends State<NurseDashboard> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -100,11 +101,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           child: Padding(
                             padding: EdgeInsets.all(5.0),
                             child: Icon(
-                              Icons.bar_chart_rounded,
-                              color: Colors.purple,
+                              Icons.notifications,
+                              color: Colors.orange,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     Container(
@@ -114,7 +115,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10.0, vertical: 10),
                       child: TextField(
-                          autofocus: true,
+                          autofocus: false,
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
@@ -125,7 +126,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 Navigator.of(context).pop();
                               },
                             ),
-                            hintText: 'Search',
+                            hintText: 'Search Patient',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide.none),
@@ -159,15 +160,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     Row(
                       children: const [
                         Icon(
-                          Icons.calendar_today,
+                          Icons.list,
                           color: Color.fromARGB(255, 7, 182, 235),
                         ),
                         Text(
-                          " August 16,1998",
+                          " List of patients",
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: Colors.black54,
                             fontWeight: FontWeight.w500,
                             fontSize: 15,
+                            letterSpacing: 1,
                           ),
                         ),
                       ],
@@ -200,14 +202,15 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Column(
                         children: [
                           Container(
-                            width: 80,
-                            height: 80,
+                            width: 60,
+                            height: 60,
                             decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
@@ -227,8 +230,17 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          const Text(
+                            "Task No: 0",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              letterSpacing: 1,
+                            ),
+                          ),
                           Container(
-                            height: 10,
+                            height: 5,
                           ),
                           const AutoSizeText(
                             "Rechie R. Arnado",
@@ -241,78 +253,51 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Container(
-                            height: 10,
+                            height: 5,
                           ),
                           const Text(
-                            "Registered Nurse ",
+                            "Room No: 202",
                             style: TextStyle(
-                              color: Color(0xFF255880),
+                              color: Colors.black54,
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
                             ),
                           ),
                           Container(
-                            height: 10,
+                            height: 5,
                           ),
-                          Row(
-                            children: const [
-                              Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.green,
-                                size: 15,
-                              ),
-                              Text(
-                                " Available",
-                                style: TextStyle(
-                                  color: Colors.black54,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                            ],
+                          const Text(
+                            "Ward No: 202",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12,
+                            ),
                           ),
                           Container(
-                            height: 10,
-                          ),
-                          Center(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 10.0),
-                              child: MaterialButton(
-                                height: 20,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                color: Colors.green,
-                                padding: const EdgeInsets.all(10),
-                                onPressed: () async {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.leftToRight,
-                                      duration:
-                                          const Duration(milliseconds: 400),
-                                      alignment: Alignment.centerLeft,
-                                      child: const PatientForm(),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  "   Assign Patient   ",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: 1,
-                                      fontSize: 13),
-                                ),
-                              ),
-                            ),
+                            height: 5,
                           ),
                         ],
                       )
                     ],
                   ),
+                  InkWell(
+                    child: const Icon(
+                      Icons.keyboard_arrow_right_rounded,
+                      color: Colors.black54,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          type: PageTransitionType.leftToRight,
+                          duration: const Duration(milliseconds: 400),
+                          alignment: Alignment.centerLeft,
+                          child: const PatientDetails(),
+                        ),
+                      );
+                    },
+                  )
                 ],
               )
             ],
