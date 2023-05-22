@@ -42,11 +42,11 @@ class AppPages {
       page: () => const DoctorDashboardScreen(),
       binding: DoctorDashboardBinding(),
     ),
-    GetPage(
-      name: AppRoutes.order,
-      page: () => const OrderScreen(),
-      binding: OrderBinding(),
-    ),
+    // GetPage(
+    //   name: AppRoutes.order,
+    //   page: () => const OrderScreen(),
+    //   binding: OrderBinding(),
+    // ),
     GetPage(
       name: AppRoutes.patient,
       page: () => const PatientScreen(),

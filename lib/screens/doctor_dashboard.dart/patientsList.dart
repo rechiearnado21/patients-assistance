@@ -152,11 +152,11 @@ class _PatientListState extends State<PatientList> {
   Widget patientsChuChu(data) {
     return InkWell(
       onTap: () {
-        print("data $data");
+        //  print("data $data");
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: ((context) => const PatientDetails()),
+            builder: ((context) => PatientDetails(dataObject: data)),
           ),
         );
       },

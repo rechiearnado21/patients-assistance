@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/routes/routes.dart';
 import 'package:nurse_assistance/screens/doctor_dashboard.dart/patientsList.dart';
+import 'package:nurse_assistance/screens/patient/view.dart';
 import 'package:nurse_assistance/variables.dart';
 import '../../dialogs.dart';
 import '../../messages.dart';
@@ -64,6 +65,8 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           } else {
             setState(() {
               data = res["rows"];
+              //data["full_name"]
+
               isLoading = false;
             });
           }
@@ -407,7 +410,15 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 20),
                                 onPressed: () async {
-                                  Get.toNamed(AppRoutes.patient);
+                                  //  Get.toNamed(AppRoutes.patient);
+                                  print("data $data");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: ((context) =>
+                                          PatientScreen(nurseData: data)),
+                                    ),
+                                  );
                                 },
                                 child: const Center(
                                   child: Text(
