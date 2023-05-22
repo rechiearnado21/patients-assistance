@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/routes/routes.dart';
+import 'package:nurse_assistance/screens/doctor_dashboard.dart/patientsList.dart';
 import 'package:nurse_assistance/variables.dart';
 import '../../dialogs.dart';
 import '../../messages.dart';
@@ -156,16 +157,26 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             )
                           ],
                         ),
-                        const Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(80))),
-                          child: Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Icon(
-                              Icons.bar_chart_rounded,
-                              color: Colors.purple,
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: ((context) => const PatientList()),
+                              ),
+                            );
+                          },
+                          child: const Card(
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(80))),
+                            child: Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(
+                                Icons.people,
+                                color: Colors.purple,
+                              ),
                             ),
                           ),
                         )

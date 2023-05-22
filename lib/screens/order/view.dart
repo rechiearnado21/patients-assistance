@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:nurse_assistance/dialogs.dart';
+import 'package:nurse_assistance/variables.dart';
 import '../../widgets/widgets.dart';
 import 'controller.dart';
 
@@ -36,23 +38,6 @@ class _OrderFormState extends State<OrderForm> {
     {"type": "Doctor", "value": "doctor"},
     {"type": "Nurse", "value": "nurse"}
   ];
-  OutlineInputBorder myinputborder() {
-    //return type is OutlineInputBorder
-    return OutlineInputBorder(
-        //Outline border type for TextFeild
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
-        ));
-  }
-
-  OutlineInputBorder myfocusborder() {
-    return OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
-        ));
-  }
 
   @override
   void initState() {
@@ -71,9 +56,11 @@ class _OrderFormState extends State<OrderForm> {
       maxDateTime: DateTime(3000),
       onMonthChangeStartWithFirstDate: true,
       onConfirm: (date, List<int> index) {
-        DateTime selectdate = date;
+        var formatter = DateFormat('dd-MM-yyyy');
+        String formattedTime = DateFormat('kk:mm:a').format(date);
+        String formattedDate = formatter.format(date);
         setState(() {
-          dateTime.text = date.toString();
+          dateTime.text = "$formattedDate $formattedTime";
         });
       },
     );
@@ -132,9 +119,9 @@ class _OrderFormState extends State<OrderForm> {
                         readOnly: true,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
-                          border: myinputborder(),
-                          enabledBorder: myinputborder(),
-                          focusedBorder: myfocusborder(),
+                          border: Variable.myinputborder(),
+                          enabledBorder: Variable.myinputborder(),
+                          focusedBorder: Variable.myfocusborder(),
                         ),
                         style: const TextStyle(
                           color: Colors.black,
@@ -159,9 +146,9 @@ class _OrderFormState extends State<OrderForm> {
                         maxLines: 10,
                         textInputAction: TextInputAction.newline,
                         decoration: InputDecoration(
-                          border: myinputborder(),
-                          enabledBorder: myinputborder(),
-                          focusedBorder: myfocusborder(),
+                          border: Variable.myinputborder(),
+                          enabledBorder: Variable.myinputborder(),
+                          focusedBorder: Variable.myfocusborder(),
                         ),
                         style: const TextStyle(
                           color: Colors.black,
@@ -183,9 +170,9 @@ class _OrderFormState extends State<OrderForm> {
                         maxLines: 10,
                         textInputAction: TextInputAction.newline,
                         decoration: InputDecoration(
-                          border: myinputborder(),
-                          enabledBorder: myinputborder(),
-                          focusedBorder: myfocusborder(),
+                          border: Variable.myinputborder(),
+                          enabledBorder: Variable.myinputborder(),
+                          focusedBorder: Variable.myfocusborder(),
                         ),
                         style: const TextStyle(
                           color: Colors.black,

@@ -32,6 +32,24 @@ class Variable {
     return "${value[0].toUpperCase()}${value.substring(1).toLowerCase()}";
   }
 
+  static OutlineInputBorder myinputborder() {
+    //return type is OutlineInputBorder
+    return OutlineInputBorder(
+        //Outline border type for TextFeild
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderSide: BorderSide(
+          color: Colors.grey.shade300,
+        ));
+  }
+
+  static OutlineInputBorder myfocusborder() {
+    return OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderSide: BorderSide(
+          color: Colors.grey.shade300,
+        ));
+  }
+
   static Widget verticalSpace(double height) => SizedBox(
         height: height,
       );

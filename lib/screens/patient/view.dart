@@ -11,9 +11,9 @@ class PatientScreen extends GetView<PatientController> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.transparent,
-    );
+    return const PatientForm(
+        //  backgroundColor: Colors.transparent,
+        );
   }
 }
 
@@ -98,7 +98,6 @@ class _PatientFormState extends State<PatientForm> {
       maxDateTime: DateTime(3000),
       onMonthChangeStartWithFirstDate: true,
       onConfirm: (date, List<int> index) {
-        DateTime selectdate = date;
         setState(() {
           dateTime.text = date.toString();
         });
