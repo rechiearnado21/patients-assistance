@@ -44,35 +44,6 @@ class _LandingBodyScreenState extends State<LandingBodyScreen> {
     return Scaffold(
       body: bottomBarPages[pageIndex],
       extendBody: true,
-      bottomNavigationBar: MoltenBottomNavigationBar(
-        selectedIndex: pageIndex,
-        domeHeight: 25,
-        barColor: Colors.grey.shade100,
-        // specify what will happen when a tab is clicked
-        onTabChange: (clickedIndex) {
-          setState(() {
-            pageIndex = clickedIndex;
-          });
-        },
-        // ansert as many tabs as you like
-        tabs: [
-          MoltenTab(
-            icon: const Icon(Icons.task_outlined),
-            title: const Text('Chart'),
-            // selectedColor: Colors.yellow,
-          ),
-          MoltenTab(
-            icon: const Icon(Icons.home),
-            title: const Text('History'),
-            // selectedColor: Colors.yellow,
-          ),
-          MoltenTab(
-            icon: const Icon(Icons.person),
-            title: const Text('Account'),
-            // selectedColor: Colors.yellow,
-          ),
-        ],
-      ),
     );
   }
 }

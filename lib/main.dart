@@ -41,7 +41,7 @@ void initilizeBackgroundService() async {
         } else if (!res["isSuccess"]) {
         } else {
           for (var item in res["rows"]) {
-            if (Variable.numSeconds(item["medic_date"]) <= 0) {
+            if (Variable.numSeconds(item["medic_date"]) <= 53) {
               await NotificationDatabase.instance
                   .readNotificationById(item['chart_id'])
                   .then((value) async {
@@ -112,7 +112,7 @@ class _MyAppState extends State<MyApp> {
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Patient Assistance',
+      title: 'Mobile Assistance App for Nurses',
       theme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: Colors.green,

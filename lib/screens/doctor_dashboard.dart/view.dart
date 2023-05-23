@@ -33,13 +33,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   List<dynamic> data = [];
   String myDepartment = "";
   String filter = '';
-  List<dynamic> dept = [
-    {"dept": "Gastroentrology", "value": 1},
-    {"dept": "Gynaecology", "value": 2},
-    {"dept": "Cardiology", "value": 3},
-    {"dept": "Neurology", "value": 4},
-    {"dept": "Pediatrics", "value": 5},
-  ];
+
   TextEditingController controller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
   @override
@@ -88,6 +82,28 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         isLoading = true;
         getData();
       });
+
+  List<dynamic> dept = [
+    {"dept": "Gastroentrology", "value": 1},
+    {"dept": "Gynaecology", "value": 2},
+    {"dept": "Cardiology", "value": 3},
+    {"dept": "Neurology", "value": 4},
+    {"dept": "Pediatrics", "value": 5},
+  ];
+  List<dynamic> typeOfUserData = [
+    {"type": "Doctor", "value": 1},
+    {"type": "Nurse", "value": 2}
+  ];
+  String myType(id) {
+    var depName = typeOfUserData
+        .where((element) {
+          return element["value"] == id;
+        })
+        .toList()[0]["type"]
+        .toString();
+
+    return depName;
+  }
 
   String myDept(id) {
     var depName = dept
@@ -182,13 +198,13 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                       height: 10,
                                     ),
                                     Text(
-                                      myDept(
-                                          Variable.userInfo["department_id"]),
+                                      "${myType(Variable.userInfo["role_id"])}/${myDept(Variable.userInfo["department_id"])}",
                                       style: const TextStyle(
                                         color: Colors.white70,
                                         fontWeight: FontWeight.w400,
                                         fontSize: 15,
                                       ),
+                                      softWrap: true,
                                     ),
                                   ],
                                 ),

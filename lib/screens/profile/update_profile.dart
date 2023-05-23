@@ -101,17 +101,21 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       title: 'Hang on',
                       message: 'Are you sure you want to logout?',
                       onTap: () async {
+                        const CustomDialog(isCancel: false).loadingDialog();
                         SharedPreferences prefs =
                             await SharedPreferences.getInstance();
                         prefs.setString("email", "");
                         prefs.setString("password", "");
+                        prefs.setString("PERSONNELID", "0");
                         Timer(const Duration(seconds: 2), () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: ((context) => const LoginScreen()),
-                            ),
-                          );
+                          Get.back();
+                          Get.offAndToNamed(AppRoutes.login);
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: ((context) => const LoginScreen()),
+                          //   ),
+                          // );
                         });
                       }).defaultDialog();
                 },
@@ -144,18 +148,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       height: 10,
                     ),
                     Text(
-                      myDept(Variable.userInfo["department_id"]),
+                      "${myType(Variable.userInfo["role_id"])}/${myDept(Variable.userInfo["department_id"])}",
                       style: const TextStyle(
                           color: Colors.black87, fontWeight: FontWeight.w500),
                     ),
-                    Container(
-                      height: 10,
-                    ),
-                    Text(
-                      myType(Variable.userInfo["role_id"]),
-                      style: const TextStyle(
-                          color: Colors.black54, fontWeight: FontWeight.w500),
-                    )
                   ],
                 ),
               ),
