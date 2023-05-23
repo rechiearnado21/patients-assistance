@@ -1,9 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nurse_assistance/dialogs.dart';
+import 'package:nurse_assistance/http_request.dart';
+import 'package:nurse_assistance/messages.dart';
+import 'package:nurse_assistance/variables.dart';
 import 'package:page_transition/page_transition.dart';
 
-import '../patient_details/patient_details.dart';
+import '../chart/charting.dart';
 
 class NurseDashboard extends StatefulWidget {
   const NurseDashboard({super.key});
@@ -13,6 +17,55 @@ class NurseDashboard extends StatefulWidget {
 }
 
 class _NurseDashboardState extends State<NurseDashboard> {
+  bool isLoading = true;
+  List<dynamic> data = [];
+  String filter = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
+    Variable.checkInternet((hasInternet) {
+      if (!hasInternet) {
+        setState(() {
+          isLoading = false;
+        });
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      } else {
+        Map<String, dynamic> parameters = {
+          "nurse_id": Variable.userInfo["personnel_id"],
+        };
+        HttpRequest(parameters: {"sqlCode": "T1350", "parameters": parameters})
+            .post()
+            .then((res) {
+          if (res == null) {
+            setState(() {
+              isLoading = false;
+            });
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else {
+            setState(() {
+              data = res["rows"];
+              isLoading = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  Future _refresh() async => setState(() {
+        isLoading = true;
+        getData();
+      });
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -178,12 +231,51 @@ class _NurseDashboardState extends State<NurseDashboard> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                    itemCount: 5,
-                    itemBuilder: (BuildContext context, int index) {
-                      return lamingaNurse(size);
-                    }),
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor),
+                      )
+                    : !isLoading && data.isEmpty
+                        ? GestureDetector(
+                            onTap: _refresh,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Center(
+                                  child: Text('No data found! Tap to refresh')),
+                            ))
+                        : StretchingOverscrollIndicator(
+                            axisDirection: AxisDirection.down,
+                            child: RefreshIndicator(
+                              onRefresh: _refresh,
+                              child: ListView.builder(
+                                  itemCount: data.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    if (filter.isEmpty) {
+                                      return lamingaNurse(
+                                          data[index], size, index);
+                                    } else {
+                                      if (data[index]['full_name']
+                                          .toLowerCase()
+                                          .contains(filter.toLowerCase())) {
+                                        return lamingaNurse(
+                                            data[index], size, index);
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    }
+                                  }),
+                            ),
+                          ),
               ),
+              // Expanded(
+              //   child: ListView.builder(
+              //       itemCount: 5,
+              //       itemBuilder: (BuildContext context, int index) {
+              //         return lamingaNurse(size);
+              //       }),
+              // ),
             ],
           ),
         ),
@@ -191,7 +283,7 @@ class _NurseDashboardState extends State<NurseDashboard> {
     );
   }
 
-  Widget lamingaNurse(size) {
+  Widget lamingaNurse(data, size, index) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
@@ -230,9 +322,9 @@ class _NurseDashboardState extends State<NurseDashboard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            "Task No: 0",
-                            style: TextStyle(
+                          Text(
+                            "Task No: ${index + 1}",
+                            style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
@@ -242,9 +334,9 @@ class _NurseDashboardState extends State<NurseDashboard> {
                           Container(
                             height: 5,
                           ),
-                          const AutoSizeText(
-                            "Rechie R. Arnado",
-                            style: TextStyle(
+                          AutoSizeText(
+                            data["full_name"],
+                            style: const TextStyle(
                               color: Color(0xFF255880),
                               fontWeight: FontWeight.w500,
                               fontSize: 15,
@@ -255,9 +347,9 @@ class _NurseDashboardState extends State<NurseDashboard> {
                           Container(
                             height: 5,
                           ),
-                          const Text(
-                            "Room No: 202",
-                            style: TextStyle(
+                          Text(
+                            "Room No: ${data["room_no"]}",
+                            style: const TextStyle(
                               color: Colors.black54,
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
@@ -266,9 +358,9 @@ class _NurseDashboardState extends State<NurseDashboard> {
                           Container(
                             height: 5,
                           ),
-                          const Text(
-                            "Ward No: 202",
-                            style: TextStyle(
+                          Text(
+                            "Ward No: ${data["ward_no"]}",
+                            style: const TextStyle(
                               color: Colors.black54,
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
@@ -293,7 +385,7 @@ class _NurseDashboardState extends State<NurseDashboard> {
                           type: PageTransitionType.leftToRight,
                           duration: const Duration(milliseconds: 400),
                           alignment: Alignment.centerLeft,
-                          child: const PatientDetails(),
+                          child: Chart(patientData: data),
                         ),
                       );
                     },

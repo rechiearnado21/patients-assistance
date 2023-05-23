@@ -148,8 +148,8 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 Container(
                                   height: 10,
                                 ),
-                                const Text(
-                                  "Specialist",
+                                Text(
+                                  Variable.userInfo["full_name"],
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontWeight: FontWeight.normal,

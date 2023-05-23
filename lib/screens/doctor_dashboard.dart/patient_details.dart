@@ -28,6 +28,7 @@ class _PatientDetailsState extends State<PatientDetails> {
   }
 
   void dataPatientGG() {
+    print("personel data ${Variable.userInfo}");
     setState(() {
       dataPatient.add(widget.dataObject);
       isLoading = false;
@@ -53,6 +54,7 @@ class _PatientDetailsState extends State<PatientDetails> {
           "patient_id": dataPatient[0]["patient_id"],
         };
 
+        print(parameters);
         HttpRequest(parameters: {"sqlCode": "T1345", "parameters": parameters})
             .post()
             .then((res) {

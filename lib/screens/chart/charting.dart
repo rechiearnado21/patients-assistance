@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:nurse_assistance/screens/chart/add_chart.dart';
 
-class PatientDetails extends StatefulWidget {
-  const PatientDetails({super.key});
+class Chart extends StatefulWidget {
+  final Object patientData;
+  const Chart({super.key, required this.patientData});
 
   @override
-  State<PatientDetails> createState() => _PatientDetailsState();
+  State<Chart> createState() => _ChartState();
 }
 
-class _PatientDetailsState extends State<PatientDetails> {
-  List<dynamic> doctorsOrderData = [
-    {
-      "date": "august 16,1998",
-      'order':
-          'Paimnon ug Paracetamol every 7 hours table> paracetamol, monges',
-      'rationale': "hehe"
-    },
-    {
-      "date": "august 16,1998",
-      'order': 'Paracetamol',
-      'rationale':
-          "Paimnon ug Paracetamol every 7 hours table> paracetamol, monges laen man sad ug dle"
-    },
-  ];
+class _ChartState extends State<Chart> {
+  List<Object> patientDataLocal = [];
+
+  @override
+  void initState() {
+    super.initState();
+    patientDataLocal.add(widget.patientData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +34,7 @@ class _PatientDetailsState extends State<PatientDetails> {
           ),
         ),
         title: const Text(
-          'Patient Details',
+          'Charting',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -47,65 +42,51 @@ class _PatientDetailsState extends State<PatientDetails> {
           ),
         ),
         actions: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(15),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: ((context) => AddChart(data: patientDataLocal)),
                 ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.add,
+                color: Colors.black,
+                size: 35,
               ),
-              Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                  color: Colors.yellow,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-            ],
+            ),
           ),
-          Container(
-            width: 10,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Early",
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 10,
-                ),
-              ),
-              Text(
-                "On Time",
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 10,
-                ),
-              ),
-              Text(
-                "Late",
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
+          // Column(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: const [
+          //     Text(
+          //       "Early",
+          //       style: TextStyle(
+          //         color: Colors.black54,
+          //         fontSize: 10,
+          //       ),
+          //     ),
+          //     Text(
+          //       "On Time",
+          //       style: TextStyle(
+          //         color: Colors.black54,
+          //         fontSize: 10,
+          //       ),
+          //     ),
+          //     Text(
+          //       "Late",
+          //       style: TextStyle(
+          //         color: Colors.black54,
+          //         fontSize: 10,
+          //       ),
+          //     ),
+          //   ],
+          // ),
           Container(
             width: 10,
           ),

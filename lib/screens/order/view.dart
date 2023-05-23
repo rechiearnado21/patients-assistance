@@ -61,6 +61,8 @@ class _OrderFormState extends State<OrderForm> {
     order = TextEditingController();
     rationale = TextEditingController();
     print("dataObject ${widget.patientData}");
+
+    print("personel data ${Variable.userInfo}");
   }
 
   dateTimePickerWidget(BuildContext context) {
@@ -260,7 +262,7 @@ class _OrderFormState extends State<OrderForm> {
     Variable.checkInternet((hasInternet) async {
       if (hasInternet) {
         Map<String, dynamic> parameters = {
-          "doctor_id": widget.patientData[0]["doctor_id"],
+          "doctor_id": Variable.userInfo["personnel_id"],
           "patient_id": widget.patientData[0]["patient_id"],
           "order_date": dateTimeValue.toString().split(".")[0],
           "order": order.text,

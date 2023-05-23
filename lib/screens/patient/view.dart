@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
 import 'package:get/get.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
@@ -34,7 +33,7 @@ class PatientForm extends StatefulWidget {
 class _PatientFormState extends State<PatientForm> {
   TextEditingController nurseName = TextEditingController();
   bool isLoading = true;
-  String? roomNo;
+  String? patientId;
   List<dynamic> nurseLocalData = [];
   List<dynamic> dropdownData = [];
   int rowsData = 0;
@@ -296,11 +295,12 @@ class _PatientFormState extends State<PatientForm> {
                                 hintText: "Select Patient",
                                 fillColor: Colors.black,
                               ),
-                              value: roomNo,
+                              value: patientId,
                               onChanged: (String? newValue) {
                                 setState(() {
-                                  roomNo = newValue!.toString();
+                                  patientId = newValue!.toString();
                                 });
+                                print("patientId $patientId");
                                 getPatientOrders(
                                     int.parse(newValue.toString()));
                               },
@@ -355,6 +355,7 @@ class _PatientFormState extends State<PatientForm> {
                         isDisabled: false,
                         onTap: () async {
                           // register();
+                          submitAssignedPatient();
                         },
                       ),
                     ),
@@ -367,5 +368,59 @@ class _PatientFormState extends State<PatientForm> {
         ),
       ),
     );
+  }
+
+  Future<void> submitAssignedPatient() async {
+    const CustomDialog(isCancel: false).loadingDialog();
+
+    Variable.checkInternet((hasInternet) async {
+      if (hasInternet) {
+        Map<String, dynamic> parameters = {
+          "doctor_id": Variable.userInfo["personnel_id"],
+          "patient_id": int.parse(patientId.toString()),
+          "nurse_id": nurseLocalData[0]["personnel_id"],
+        };
+
+        HttpRequest(parameters: {"sqlCode": "T1349", "parameters": parameters})
+            .post()
+            .then((res) async {
+          if (res == null) {
+            Get.back();
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else if (res["rows"].isNotEmpty) {
+            Get.back();
+            if (res["rows"][0]["success"] == "Y") {
+              CustomDialog(
+                  title: "Success",
+                  message: res["rows"][0]["msg"],
+                  isSuccess: false,
+                  isCancel: false,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  }).defaultDialog();
+            } else {
+              CustomDialog(
+                      message: res["rows"][0]["msg"],
+                      isSuccess: false,
+                      isCancel: false)
+                  .defaultDialog();
+            }
+          } else {
+            Get.back();
+
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          }
+        });
+      } else {
+        Get.back();
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      }
+    });
   }
 }
