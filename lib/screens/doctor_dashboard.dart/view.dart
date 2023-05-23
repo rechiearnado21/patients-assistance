@@ -2,10 +2,11 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:nurse_assistance/http_request.dart';
-import 'package:nurse_assistance/routes/routes.dart';
 import 'package:nurse_assistance/screens/doctor_dashboard.dart/patientsList.dart';
 import 'package:nurse_assistance/screens/patient/view.dart';
+import 'package:nurse_assistance/screens/profile/update_profile.dart';
 import 'package:nurse_assistance/variables.dart';
 import '../../dialogs.dart';
 import '../../messages.dart';
@@ -30,13 +31,21 @@ class DoctorDashboard extends StatefulWidget {
 class _DoctorDashboardState extends State<DoctorDashboard> {
   bool isLoading = true;
   List<dynamic> data = [];
+  String myDepartment = "";
   String filter = '';
+  List<dynamic> dept = [
+    {"dept": "Gastroentrology", "value": 1},
+    {"dept": "Gynaecology", "value": 2},
+    {"dept": "Cardiology", "value": 3},
+    {"dept": "Neurology", "value": 4},
+    {"dept": "Pediatrics", "value": 5},
+  ];
   TextEditingController controller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
   @override
   void initState() {
-    getData();
     super.initState();
+    getData();
   }
 
   Future<void> getData() async {
@@ -80,6 +89,17 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         getData();
       });
 
+  String myDept(id) {
+    var depName = dept
+        .where((element) {
+          return element["value"] == id;
+        })
+        .toList()[0]["dept"]
+        .toString();
+
+    return depName;
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -118,47 +138,63 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image:
-                                        AssetImage("assets/images/doctora.png"),
-                                  )),
-                            ),
-                            Container(
-                              width: 10,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  Variable.userInfo["full_name"],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 20,
-                                  ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: ((context) =>
+                                          const UpdateProfile()),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(
+                                            "assets/images/doctora.png"),
+                                      )),
                                 ),
-                                Container(
-                                  height: 10,
+                              ),
+                              Container(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    AutoSizeText(
+                                      "${Variable.userInfo["full_name"]}",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 17),
+                                      maxFontSize: 20,
+                                    ),
+                                    Container(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      myDept(
+                                          Variable.userInfo["department_id"]),
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  Variable.userInfo["full_name"],
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
+                              )
+                            ],
+                          ),
                         ),
                         InkWell(
                           onTap: () {
@@ -249,14 +285,14 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 child: Column(
                   children: [
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.calendar_today,
                           color: Color.fromARGB(255, 7, 182, 235),
                         ),
                         Text(
-                          " August 16,1998",
-                          style: TextStyle(
+                          ' ${DateFormat.yMMMd().format(DateTime.now())}',
+                          style: const TextStyle(
                             color: Colors.black87,
                             fontWeight: FontWeight.w500,
                             fontSize: 15,
@@ -365,9 +401,9 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           Container(
                             height: 10,
                           ),
-                          const Text(
-                            "Registered Nurse ",
-                            style: TextStyle(
+                          Text(
+                            myDept(data["department_id"]),
+                            style: const TextStyle(
                               color: Color(0xFF255880),
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
@@ -399,8 +435,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           ),
                           Center(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 10.0),
+                              padding: const EdgeInsets.only(right: 10.0),
                               child: MaterialButton(
                                 height: 20,
                                 shape: RoundedRectangleBorder(
@@ -408,10 +443,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 ),
                                 color: Colors.green,
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
+                                    vertical: 10, horizontal: 15),
                                 onPressed: () async {
                                   //  Get.toNamed(AppRoutes.patient);
-                                  print("data $data");
+                                  //print("data $data");
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -424,10 +459,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                   child: Text(
                                     "Assign Patient",
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 1,
-                                        fontSize: 13),
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 1,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ),
                               ),

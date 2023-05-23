@@ -15,35 +15,74 @@ class PatientDetails extends StatefulWidget {
   State<PatientDetails> createState() => _PatientDetailsState();
 }
 
-class _PatientDetailsState extends State<PatientDetails> {
+class _PatientDetailsState extends State<PatientDetails>
+    with SingleTickerProviderStateMixin {
   bool isLoading = true;
+  bool isLoadingPatient = true;
+  bool isLoadingOrder = true;
+  int tabIndex = 0;
   List<dynamic> dataPatient = [];
   List<dynamic> data = [];
+  List<dynamic> dataMonitoringTask = [];
   var doctorsOrderWidget = <Widget>[];
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(vsync: this, length: 2);
     dataPatientGG();
   }
 
   void dataPatientGG() {
-    print("personel data ${Variable.userInfo}");
     setState(() {
       dataPatient.add(widget.dataObject);
       isLoading = false;
     });
-    getData();
+    refresh();
+    refreshMonitoring();
   }
 
-  Future<void> getData() async {
-    setState(() {
-      doctorsOrderWidget = <Widget>[];
-    });
+  Future<void> getMonitoringData() async {
     Variable.checkInternet((hasInternet) {
       if (!hasInternet) {
         setState(() {
-          isLoading = false;
+          isLoadingPatient = false;
+        });
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      } else {
+        Map<String, dynamic> parameters = {
+          "patient_id": dataPatient[0]["patient_id"],
+        };
+
+        HttpRequest(parameters: {"sqlCode": "T1352", "parameters": parameters})
+            .post()
+            .then((res) {
+          if (res == null) {
+            setState(() {
+              isLoadingPatient = false;
+            });
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else {
+            setState(() {
+              dataMonitoringTask = res["rows"];
+              isLoadingPatient = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  Future<void> getData() async {
+    Variable.checkInternet((hasInternet) {
+      if (!hasInternet) {
+        setState(() {
+          isLoadingOrder = false;
         });
         CustomDialog(
                 message: Message.noInternet, isSuccess: false, isCancel: false)
@@ -54,13 +93,12 @@ class _PatientDetailsState extends State<PatientDetails> {
           "patient_id": dataPatient[0]["patient_id"],
         };
 
-        print(parameters);
         HttpRequest(parameters: {"sqlCode": "T1345", "parameters": parameters})
             .post()
             .then((res) {
           if (res == null) {
             setState(() {
-              isLoading = false;
+              isLoadingOrder = false;
             });
             CustomDialog(
                     message: Message.error, isSuccess: false, isCancel: false)
@@ -68,84 +106,8 @@ class _PatientDetailsState extends State<PatientDetails> {
           } else {
             setState(() {
               data = res["rows"];
-              if (data.isEmpty) {
-                doctorsOrderWidget.add(const Center(
-                  child: Text("No Orders"),
-                ));
-              } else {
-                doctorsOrderWidget.add(Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            "Date",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )),
-                        Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            "Order",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )),
-                        Expanded(
-                            child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            "Rationale",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        )),
-                      ],
-                    ),
-                    Container(
-                      height: 10,
-                    ),
-                  ],
-                ));
-                for (int i = 0; i < data.length; i++) {
-                  doctorsOrderWidget.add(Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          data[i]["order_date"],
-                          softWrap: true,
-                        ),
-                      )),
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          data[i]["order"],
-                          softWrap: true,
-                        ),
-                      )),
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          data[i]["rationale"],
-                          softWrap: true,
-                        ),
-                      )),
-                    ],
-                  ));
-                }
-              }
 
-              isLoading = false;
+              isLoadingOrder = false;
             });
           }
         });
@@ -153,9 +115,13 @@ class _PatientDetailsState extends State<PatientDetails> {
     });
   }
 
-  Future _refresh() async => setState(() {
-        isLoading = true;
+  Future refresh() async => setState(() {
+        isLoadingOrder = true;
         getData();
+      });
+  Future refreshMonitoring() async => setState(() {
+        isLoadingPatient = true;
+        getMonitoringData();
       });
 
   @override
@@ -164,6 +130,25 @@ class _PatientDetailsState extends State<PatientDetails> {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
       child: Scaffold(
+        // ignore: unrelated_type_equality_checks
+        floatingActionButton: tabIndex == 1
+            ? const SizedBox()
+            : Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) => OrderScreen(
+                            dataObject: dataPatient, onSuccess: refresh)),
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.green,
+                  child: const Icon(Icons.add),
+                ),
+              ),
         appBar: AppBar(
           backgroundColor: const Color(0xFF06919d),
           systemOverlayStyle: const SystemUiOverlayStyle(
@@ -181,8 +166,9 @@ class _PatientDetailsState extends State<PatientDetails> {
             ),
           ),
           title: const Text(
-            "Patient Information",
+            "Patient Details",
             style: TextStyle(
+              fontSize: 20,
               color: Colors.white,
             ),
           ),
@@ -194,452 +180,404 @@ class _PatientDetailsState extends State<PatientDetails> {
             height: size.height,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    isLoading
-                        ? const CircularProgressIndicator()
-                        : Container(
+              child: Column(
+                children: [
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
                             color: Colors.white,
-                            width: size.width,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: AssetImage(
-                                            "assets/images/profileimage.png"),
-                                      ),
-                                      Container(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: AutoSizeText(
-                                                    dataPatient[0]["full_name"],
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                    overflow: TextOverflow.fade,
-                                                    maxLines: 2,
+                          ),
+                          width: size.width,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: AssetImage(
+                                          "assets/images/profileimage.png"),
+                                    ),
+                                    Container(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: AutoSizeText(
+                                                  dataPatient[0]["full_name"],
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w500,
                                                   ),
+                                                  overflow: TextOverflow.fade,
+                                                  maxLines: 2,
                                                 ),
-                                                Container(
-                                                  width: 3,
-                                                )
-                                              ],
-                                            ),
-                                            Container(
-                                              width: 5,
-                                            ),
-                                            Container(
-                                              height: 5,
-                                            ),
-                                            const Text(
-                                              "Patient Name",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal,
                                               ),
+                                              Container(
+                                                width: 3,
+                                              )
+                                            ],
+                                          ),
+                                          Container(
+                                            width: 5,
+                                          ),
+                                          Container(
+                                            height: 5,
+                                          ),
+                                          const Text(
+                                            "Patient Name",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 10,
-                                  ),
-                                  const Divider(),
-                                  Text("Address: ${dataPatient[0]["address"]}"),
-                                  Container(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                      "Mobile: ${dataPatient[0]["mobile_no"]}"),
-                                  Container(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                      "BirthDate: ${dataPatient[0]["birth_date"]}"),
-                                  Container(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                          child: Text(
-                                              "Age:  ${dataPatient[0]["age"]}")),
-                                      Expanded(
-                                          child: Text(
-                                              "Gender: ${dataPatient[0]["gender"]}")),
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                          child: Text(
-                                              "Room#: ${dataPatient[0]["room_no"]}")),
-                                      Expanded(
-                                          child: Text(
-                                              "Ward#: ${dataPatient[0]["ward_no"]}")),
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Text("Diagnosis: "),
-                                      Text(dataPatient[0]["diagnosis"]),
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 20,
-                                  ),
-                                ],
-                              ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  height: 10,
+                                ),
+                                const Divider(),
+                                Text("Address: ${dataPatient[0]["address"]}"),
+                                Container(
+                                  height: 10,
+                                ),
+                                Text("Mobile: ${dataPatient[0]["mobile_no"]}"),
+                                Container(
+                                  height: 10,
+                                ),
+                                Text(
+                                    "BirthDate: ${dataPatient[0]["birth_date"]}"),
+                                Container(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: Text(
+                                            "Age:  ${dataPatient[0]["age"]}")),
+                                    Expanded(
+                                        child: Text(
+                                            "Gender: ${dataPatient[0]["gender"]}")),
+                                  ],
+                                ),
+                                Container(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: Text(
+                                            "Room#: ${dataPatient[0]["room_no"]}")),
+                                    Expanded(
+                                        child: Text(
+                                            "Ward#: ${dataPatient[0]["ward_no"]}")),
+                                  ],
+                                ),
+                                Container(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text("Diagnosis: "),
+                                    Text(dataPatient[0]["diagnosis"]),
+                                  ],
+                                ),
+                                Container(
+                                  height: 20,
+                                ),
+                              ],
                             ),
                           ),
-                    Container(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Doctors Order",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: ((context) => OrderScreen(
-                                    dataObject: dataPatient,
-                                    onSuccess: getData)),
-                              ),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.add,
-                            color: Colors.purple,
-                          ),
-                        )
+                  Container(
+                    height: 20,
+                  ),
+                  TabBar(
+                    controller: tabController,
+                    onTap: (index) {
+                      setState(() {
+                        tabIndex = index;
+                      });
+                    },
+                    isScrollable: false,
+                    labelColor: Colors.black,
+                    indicatorColor: Colors.blue,
+                    labelPadding: const EdgeInsets.all(0),
+                    unselectedLabelStyle: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w400),
+                    labelStyle: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700),
+                    tabs: const [
+                      Tab(
+                        // icon: Icon(Icons.add_circle_outline_rounded),
+                        text: "Order",
+                      ),
+                      Tab(
+                          // icon: Icon(Icons.add_circle_outline_rounded),
+                          text: "Patient Monitoring"),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: tabController,
+                      children: [
+                        doctorsOrderTab(size),
+                        patientMonitoringTab(size),
                       ],
                     ),
-                    Container(
-                      height: 10,
-                    ),
-                    Container(
-                      color: Colors.white,
-                      width: size.width,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          children: doctorsOrderWidget,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 20,
-                    ),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Task",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 10,
-                    ),
-                    Container(
-                      color: Colors.white,
-                      width: size.width,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(color: Colors.grey.shade200),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Center(
-                                          child: Text(
-                                            "Task 1",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const Text(
-                                          "John Doe",
-                                          style: TextStyle(
-                                              color: Color(0xFF255880),
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500),
-                                          maxLines: 2,
-                                        ),
-                                        Container(
-                                          height: 5,
-                                        ),
-                                        const Text(
-                                          "Patient Name",
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.normal),
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    const Divider(),
-                                    Container(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: const [
-                                        Icon(
-                                          Icons.medication,
-                                          color: Colors.red,
-                                        ),
-                                        Text(
-                                          " Paracetamol",
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.normal),
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: const [
-                                        Icon(
-                                          Icons.alarm,
-                                          color: Colors.purple,
-                                        ),
-                                        Text(
-                                          " 3:00 PM 08/18/1998",
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.normal),
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 10,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(color: Colors.grey.shade200),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Center(
-                                          child: Text(
-                                            "Task 2",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const Text(
-                                          "John Doe",
-                                          style: TextStyle(
-                                              color: Color(0xFF255880),
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500),
-                                          maxLines: 2,
-                                        ),
-                                        Container(
-                                          height: 5,
-                                        ),
-                                        const Text(
-                                          "Patient Name",
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.normal),
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    const Divider(),
-                                    Container(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: const [
-                                        Icon(
-                                          Icons.medication,
-                                          color: Colors.red,
-                                        ),
-                                        Text(
-                                          " Paracetamol",
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.normal),
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: const [
-                                        Icon(
-                                          Icons.alarm,
-                                          color: Colors.purple,
-                                        ),
-                                        Text(
-                                          " 3:00 PM 08/18/1998",
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.normal),
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            // isLoading
-            //     ? Center(
-            //         child: CircularProgressIndicator(
-            //             color: Theme.of(context).primaryColor),
-            //       )
-            //     : !isLoading && data.isEmpty
-            //         ? GestureDetector(
-            //             onTap: _refresh,
-            //             child: const Padding(
-            //               padding: EdgeInsets.symmetric(horizontal: 20),
-            //               child: Center(
-            //                   child: Text('No data found! Tap to refresh')),
-            //             ))
-            //         : StretchingOverscrollIndicator(
-            //             axisDirection: AxisDirection.down,
-            //             child: RefreshIndicator(
-            //               onRefresh: _refresh,
-            //               child: ListView.builder(
-            //                   itemCount: data.length,
-            //                   itemBuilder: (BuildContext context, int index) {
-            //                     return patientsChuChu(data[index]);
-            //                   }),
-            //             ),
-            //           ),
-
-            // ListView.builder(
-            //     itemCount: 5,
-            //     itemBuilder: (BuildContext context, int index) {
-            //       return patientsChuChu();
-            //     }),
           ),
         ),
       ),
     );
   }
 
-  Widget patientsChuChu(data) {
-    return InkWell(
-      onTap: () {
-        print("data $data");
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.grey.shade100,
-          ),
-          child: ListTile(
-            leading: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey,
+  Widget doctorsOrderTab(size) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0),
+      child: isLoadingOrder
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor),
+            )
+          : !isLoadingOrder && data.isEmpty
+              ? GestureDetector(
+                  onTap: refresh,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Center(child: Text('No data found! Tap to refresh')),
+                  ))
+              : Container(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 10),
+                    child: StretchingOverscrollIndicator(
+                      axisDirection: AxisDirection.down,
+                      child: RefreshIndicator(
+                        onRefresh: refresh,
+                        child: ListView.builder(
+                            itemCount: data.length,
+                            padding: const EdgeInsets.only(top: 15),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Column(
+                                children: [
+                                  if (index == 0)
+                                    Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: const [
+                                            Expanded(
+                                                child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                "Date",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15),
+                                              ),
+                                            )),
+                                            Expanded(
+                                                child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                "Order",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15),
+                                              ),
+                                            )),
+                                            Expanded(
+                                                child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                "Rationale",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15),
+                                              ),
+                                            )),
+                                          ],
+                                        ),
+                                        Container(
+                                          height: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          data[index]["order_date"],
+                                          softWrap: true,
+                                        ),
+                                      )),
+                                      Expanded(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          data[index]["order"],
+                                          softWrap: true,
+                                        ),
+                                      )),
+                                      Expanded(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          data[index]["rationale"],
+                                          softWrap: true,
+                                        ),
+                                      )),
+                                    ],
+                                  ),
+                                  Variable.verticalSpace(10)
+                                ],
+                              );
+                            }),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            title: Text(data['full_name']),
-            subtitle: const Text("Patient Name"),
-            trailing: const Icon(
-              Icons.keyboard_arrow_right_rounded,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ),
+    );
+  }
+
+  Widget patientMonitoringTab(size) {
+    print("isLoadingPatient $isLoadingPatient");
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: isLoadingPatient
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor),
+            )
+          : !isLoadingPatient && dataMonitoringTask.isEmpty
+              ? GestureDetector(
+                  onTap: refreshMonitoring,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Center(child: Text('No data found! Tap to refresh')),
+                  ))
+              : StretchingOverscrollIndicator(
+                  axisDirection: AxisDirection.down,
+                  child: RefreshIndicator(
+                    onRefresh: refreshMonitoring,
+                    child: ListView.builder(
+                        itemCount: dataMonitoringTask.length,
+                        padding: const EdgeInsets.only(top: 15),
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              Material(
+                                elevation: 1,
+                                borderRadius: BorderRadius.circular(15),
+                                child: Container(
+                                  height: 200,
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Colors.primaries[Variable.colorIndex(
+                                        dataMonitoringTask[index]['chart_id'])],
+                                  ),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(12),
+                                          child: Text(
+                                            "Task No: ${index + 1}",
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(15),
+                                                  bottomRight:
+                                                      Radius.circular(15)),
+                                              color: Colors.white,
+                                            ),
+                                            padding: const EdgeInsets.all(12),
+                                            child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    dataMonitoringTask[index]
+                                                        ['medic_name'],
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 18),
+                                                  ),
+                                                  Variable.verticalSpace(10),
+                                                  Text(
+                                                    'Date: ${dataMonitoringTask[index]['medic_date'].toString().split(' ')[0]}',
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15),
+                                                  ),
+                                                  Variable.verticalSpace(10),
+                                                  Text(
+                                                    'Time: ${dataMonitoringTask[index]['medic_date'].toString().split(' ')[1]}',
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15),
+                                                  ),
+                                                  Variable.verticalSpace(10),
+                                                  Text(
+                                                    'Nurse: ${dataMonitoringTask[index]['full_name']}',
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 15),
+                                                  ),
+                                                ]),
+                                          ),
+                                        )
+                                      ]),
+                                ),
+                              ),
+                              Variable.verticalSpace(10)
+                            ],
+                          );
+                        }),
+                  ),
+                ),
     );
   }
 }

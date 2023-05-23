@@ -11,6 +11,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
       this.elevation = 0.0,
       this.leading,
       this.automaticallyImplyLeading = true,
+      this.action,
       this.statusBarIconBrightness})
       : super(key: key);
 
@@ -22,6 +23,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   final Widget? leading;
   final bool automaticallyImplyLeading;
   final Brightness? statusBarIconBrightness;
+  final List<Widget>? action;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +40,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
           statusBarIconBrightness: statusBarIconBrightness ?? Brightness.dark,
         ),
         elevation: elevation,
+        actions: action,
         bottom: bottom);
   }
 

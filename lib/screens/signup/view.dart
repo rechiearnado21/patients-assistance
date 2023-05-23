@@ -159,8 +159,8 @@ class _SignupBodyScreenState extends State<SignupBodyScreen> {
                             child: AutoSizeText(
                               item['type'],
                               style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w200),
+                                color: Colors.black,
+                              ),
                               overflow: TextOverflow.ellipsis,
                               maxFontSize: 15,
                               maxLines: 2,
@@ -192,8 +192,8 @@ class _SignupBodyScreenState extends State<SignupBodyScreen> {
                             child: AutoSizeText(
                               item['dept'],
                               style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w200),
+                                color: Colors.black,
+                              ),
                               overflow: TextOverflow.ellipsis,
                               maxFontSize: 15,
                               maxLines: 2,

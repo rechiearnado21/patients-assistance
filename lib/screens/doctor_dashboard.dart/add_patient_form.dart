@@ -13,7 +13,8 @@ import 'package:nurse_assistance/widgets/custom_btn.dart';
 import '../../messages.dart';
 
 class AddPatient extends StatefulWidget {
-  const AddPatient({super.key});
+  final Function callBack;
+  const AddPatient({super.key, required this.callBack});
 
   @override
   State<AddPatient> createState() => _AddPatientState();
@@ -29,6 +30,7 @@ class _AddPatientState extends State<AddPatient> {
   TextEditingController patientDiagnosis = TextEditingController();
   TextEditingController roomNumber = TextEditingController();
   TextEditingController wardNumber = TextEditingController();
+  late TabController tabController;
   final DateTime _date = DateTime.now();
   late DateTime dateTime;
   String? roomNo;
@@ -295,8 +297,8 @@ class _AddPatientState extends State<AddPatient> {
                                       child: AutoSizeText(
                                         item['gender'],
                                         style: const TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w200),
+                                          color: Colors.black,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                         maxFontSize: 15,
                                         maxLines: 2,
@@ -313,7 +315,7 @@ class _AddPatientState extends State<AddPatient> {
                           controller: patientDiagnosis,
                           obscureText: false,
                           maxLines: 5,
-                          textInputAction: TextInputAction.done,
+                          textInputAction: TextInputAction.newline,
                           decoration: InputDecoration(
                             border: Variable.myinputborder(),
                             enabledBorder: Variable.myinputborder(),
@@ -354,8 +356,8 @@ class _AddPatientState extends State<AddPatient> {
                                       child: AutoSizeText(
                                         item['room'],
                                         style: const TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w200),
+                                          color: Colors.black,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                         maxFontSize: 15,
                                         maxLines: 2,
@@ -382,7 +384,6 @@ class _AddPatientState extends State<AddPatient> {
                                   setState(() {
                                     wardNo = newValue!.toString();
                                   });
-                                  print("wardNo $wardNo");
                                 },
                                 items: wardData.map((item) {
                                   return DropdownMenuItem(
@@ -390,8 +391,8 @@ class _AddPatientState extends State<AddPatient> {
                                       child: AutoSizeText(
                                         item['ward'],
                                         style: const TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w200),
+                                          color: Colors.black,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                         maxFontSize: 15,
                                         maxLines: 2,
@@ -506,6 +507,7 @@ class _AddPatientState extends State<AddPatient> {
                   isSuccess: false,
                   isCancel: false,
                   onTap: () {
+                    widget.callBack();
                     Navigator.of(context).pop();
                   }).defaultDialog();
             } else {

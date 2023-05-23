@@ -77,7 +77,7 @@ class _PatientListState extends State<PatientList> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: ((context) => const AddPatient()),
+                  builder: ((context) => AddPatient(callBack: getData)),
                 ),
               );
             },

@@ -69,8 +69,8 @@ class _PatientFormState extends State<PatientForm> {
       } else {
         Map<String, dynamic> parameters = {
           "department_id": Variable.userInfo["department_id"],
+          "nurse_id": nurseLocalData[0]["personnel_id"],
         };
-
         HttpRequest(parameters: {"sqlCode": "T1347", "parameters": parameters})
             .post()
             .then((res) {
@@ -300,7 +300,7 @@ class _PatientFormState extends State<PatientForm> {
                                 setState(() {
                                   patientId = newValue!.toString();
                                 });
-                                print("patientId $patientId");
+
                                 getPatientOrders(
                                     int.parse(newValue.toString()));
                               },
@@ -349,14 +349,16 @@ class _PatientFormState extends State<PatientForm> {
                         height: 50,
                         width: MediaQuery.of(context).size.width,
                         borderRadius: 15,
-                        text: 'Assign Patient',
+                        text: 'Submit',
                         textColor: const Color(0xFFffffff),
                         backgroundColor: Colors.green,
-                        isDisabled: false,
-                        onTap: () async {
-                          // register();
-                          submitAssignedPatient();
-                        },
+                        isDisabled: patientId == null ? true : false,
+                        onTap: patientId == null
+                            ? () {}
+                            : () async {
+                                // register();
+                                submitAssignedPatient();
+                              },
                       ),
                     ),
                     Container(
