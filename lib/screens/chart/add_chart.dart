@@ -11,7 +11,8 @@ import 'package:nurse_assistance/widgets/custom_btn.dart';
 
 class AddChart extends StatefulWidget {
   final dynamic data;
-  const AddChart({super.key, required this.data});
+  final Function() callBack;
+  const AddChart({super.key, required this.data, required this.callBack});
 
   @override
   State<AddChart> createState() => _AddChartState();
@@ -75,7 +76,8 @@ class _AddChartState extends State<AddChart> {
         ),
         centerTitle: true,
         systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light),
+            statusBarIconBrightness: Brightness.dark,
+            statusBarColor: Colors.white),
         elevation: 0.5,
       ),
       body: SafeArea(
@@ -255,6 +257,7 @@ class _AddChartState extends State<AddChart> {
           } else if (res["rows"].isNotEmpty) {
             Get.back();
             if (res["rows"][0]["success"] == "Y") {
+              widget.callBack();
               CustomDialog(
                   title: "Success",
                   message: res["rows"][0]["msg"],

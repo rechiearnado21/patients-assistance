@@ -8,6 +8,7 @@ class Variable {
   static String password = '';
   static dynamic userInfo;
   static int orNo = 0;
+  static String notificationTable = 'notifications';
   static FlutterTts flutterTts = FlutterTts();
   static int colorIndex(int index) {
     return index > 17

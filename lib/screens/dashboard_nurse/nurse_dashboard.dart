@@ -1,72 +1,18 @@
-import 'dart:isolate';
-
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nurse_assistance/database/notifications_table.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/messages.dart';
-import 'package:nurse_assistance/notification_service.dart';
+import 'package:nurse_assistance/notifications/notifications_screen.dart';
 import 'package:nurse_assistance/variables.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../chart/charting.dart';
-
-@pragma('vm:entry-point')
-void initilizeBackgroundService() async {
-  NotificationServices notificationServices = NotificationServices();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  final String personnelId = prefs.getString("PERSONNELID") ?? "0";
-  final DateTime now = DateTime.now();
-  final int isolateId = Isolate.current.hashCode;
-
-  notificationServices.initializeNotifications();
-
-  int notifId = prefs.getInt("notification_id") ?? 0;
-  int nNotifId = notifId + 1;
-
-  prefs.setInt("notification_id", nNotifId);
-  //notificationServices.sendNotification(nNotifId, 'Admin', item["message"]);
-
-  if (int.parse(personnelId) == 0) return;
-
-  Variable.checkInternet((hasInternet) {
-    if (!hasInternet) {
-    } else {
-      var mapMsg = <String, dynamic>{};
-
-      //mapMsg["lastsync"] = lastSyncMsg;
-      mapMsg["nurse_id"] = int.parse(personnelId);
-
-      Map<String, dynamic> parameters = {
-        "nurse_id": Variable.userInfo["personnel_id"],
-      };
-
-      HttpRequest(parameters: {"sqlCode": "T1353", "parameters": parameters})
-          .post()
-          .then((res) async {
-        if (res == null) {
-        } else {
-          for (var item in res["rows"]) {
-            if (Variable.numSeconds(item["medic_date"]) <= 0) {
-              int notifId = prefs.getInt("notification_id") ?? 0;
-              int nNotifId = notifId + 1;
-
-              prefs.setInt("notification_id", nNotifId);
-              notificationServices.sendNotification(
-                  nNotifId, 'Admin', item["message"]);
-
-              await Variable.flutterTts
-                  .speak('Patumara ang pasyenti sa room 201 ug paracetamol.');
-            }
-          }
-        }
-      });
-    }
-  });
-}
 
 class NurseDashboard extends StatefulWidget {
   const NurseDashboard({super.key});
@@ -79,20 +25,43 @@ class _NurseDashboardState extends State<NurseDashboard> {
   bool isLoading = true;
   List<dynamic> data = [];
   String filter = '';
+  int noNotification = 0;
 
   @override
   void initState() {
-    super.initState();
+    getNotificationCount();
     getData();
+    initPlatformState();
+    super.initState();
   }
 
-  Future<void> initiateNotify() async {
-    await AndroidAlarmManager.initialize();
-    const int helloAlarmID = 0;
+  Future<void> initPlatformState() async {
+    var status = await Permission.notification.status;
+    if (status.isDenied) {
+      await Permission.notification.request();
 
-    await AndroidAlarmManager.periodic(
-        const Duration(seconds: 3), helloAlarmID, initilizeBackgroundService,
-        startAt: DateTime.now());
+      CustomDialog(
+          message:
+              "Notification permission denied. Open app settings to manage notification permission.",
+          isSuccess: false,
+          isCancel: false,
+          title: 'Error',
+          onTap: () {
+            openAppSettings();
+          }).defaultDialog();
+    }
+
+    if (status.isPermanentlyDenied) {
+      CustomDialog(
+          message:
+              "Notification permission permanently denied. Open app settings to manage notification permission.",
+          isSuccess: false,
+          isCancel: false,
+          title: 'Error',
+          onTap: () {
+            openAppSettings();
+          }).defaultDialog();
+    }
   }
 
   Future<void> getData() async {
@@ -133,6 +102,25 @@ class _NurseDashboardState extends State<NurseDashboard> {
         isLoading = true;
         getData();
       });
+
+  void getNotificationCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      noNotification = prefs.getInt("NOOFNOTIFICATION") ?? 0;
+    });
+
+    Timer(const Duration(seconds: 5), () async {
+      await NotificationDatabase.instance.readAllNotifications().then((value) {
+        prefs.setInt("NOOFNOTIFICATION", value.length);
+
+        setState(() {
+          noNotification = value.length;
+        });
+        getNotificationCount();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,16 +202,69 @@ class _NurseDashboardState extends State<NurseDashboard> {
                             )
                           ],
                         ),
-                        const Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(80))),
-                          child: Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Icon(
-                              Icons.notifications,
-                              color: Colors.orange,
+                        Container(
+                          width: 35,
+                          height: 35,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.white),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const NotificationsScreen(),
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              fit: StackFit.loose,
+                              clipBehavior: Clip.none,
+                              alignment: const Alignment(1, -0.5),
+                              children: [
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.notifications,
+                                    size: 25,
+                                    color: Theme.of(context)
+                                        .listTileTheme
+                                        .iconColor,
+                                  ),
+                                ),
+                                noNotification > 0
+                                    ? Positioned(
+                                        child: Container(
+                                          width: 18,
+                                          height: 18,
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.red),
+                                          child: Center(
+                                            child: SizedBox(
+                                              width: 15,
+                                              height: 15,
+                                              child: Center(
+                                                child: AutoSizeText(
+                                                  noNotification > 9
+                                                      ? '9+'
+                                                      : '$noNotification',
+                                                  maxLines: 1,
+                                                  maxFontSize: 11,
+                                                  minFontSize: 8,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                      color: Color(0xFFffffff),
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox()
+                              ],
                             ),
                           ),
                         ),
@@ -352,115 +393,123 @@ class _NurseDashboardState extends State<NurseDashboard> {
   }
 
   Widget lamingaNurse(data, size, index) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Container(
-        width: size.width,
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/images/profileimage.png"),
-                                )),
-                          ),
-                          Container(
-                            height: 40,
-                          )
-                        ],
-                      ),
-                      Container(
-                        width: 15,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Task No: ${index + 1}",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              letterSpacing: 1,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          PageTransition(
+            type: PageTransitionType.leftToRight,
+            duration: const Duration(milliseconds: 400),
+            alignment: Alignment.centerLeft,
+            child: Chart(patientData: data),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Container(
+          width: size.width,
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/profileimage.png"),
+                                  )),
                             ),
-                          ),
-                          Container(
-                            height: 5,
-                          ),
-                          AutoSizeText(
-                            data["full_name"],
-                            style: const TextStyle(
-                              color: Color(0xFF255880),
-                              fontWeight: FontWeight.w500,
-                              fontSize: 15,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Container(
-                            height: 5,
-                          ),
-                          Text(
-                            "Room No: ${data["room_no"]}",
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Container(
-                            height: 5,
-                          ),
-                          Text(
-                            "Ward No: ${data["ward_no"]}",
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Container(
-                            height: 5,
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  InkWell(
-                    child: const Icon(
-                      Icons.keyboard_arrow_right_rounded,
-                      color: Colors.black54,
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          type: PageTransitionType.leftToRight,
-                          duration: const Duration(milliseconds: 400),
-                          alignment: Alignment.centerLeft,
-                          child: Chart(patientData: data),
+                            Container(
+                              height: 40,
+                            )
+                          ],
                         ),
-                      );
-                    },
-                  )
-                ],
-              )
-            ],
+                        Container(
+                          width: 15,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AutoSizeText(
+                              data["full_name"],
+                              style: const TextStyle(
+                                color: Color(0xFF255880),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Container(
+                              height: 5,
+                            ),
+                            Text(
+                              "Room No: ${data["room_no"]}",
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Container(
+                              height: 5,
+                            ),
+                            Text(
+                              "Ward No: ${data["ward_no"]}",
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Container(
+                              height: 5,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Icon(
+                          Icons.keyboard_arrow_right_rounded,
+                          color: Colors.black54,
+                        ),
+                        Variable.verticalSpace(15),
+                        Container(
+                          height: 35,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).primaryColor),
+                          child: const Center(
+                            child: Text(
+                              'Recommend',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -4,7 +4,6 @@ import 'package:nurse_assistance/routes/routes.dart';
 import '../screens/doctor_dashboard.dart/index.dart';
 import '../screens/landing/index.dart';
 import '../screens/login/index.dart';
-import '../screens/order/index.dart';
 import '../screens/patient/index.dart';
 import '../screens/signup/index.dart';
 import '../screens/splash/index.dart';
