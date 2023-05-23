@@ -317,6 +317,8 @@ class _LoginBodyScreenState extends State<LoginBodyScreen>
             prefs.setString("password", _password.text);
 
             Variable.userInfo = res["rows"][0];
+            prefs.setString(
+                "PERSONNELID", Variable.userInfo["personnel_id"].toString());
             if (Variable.userInfo["role_id"] == 1) {
               Get.offAndToNamed(AppRoutes.doctorDashboard);
             } else {

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:nurse_assistance/screens/chart/add_chart.dart';
 
+import '../../dialogs.dart';
+import '../../http_request.dart';
+import '../../messages.dart';
+import '../../variables.dart';
+
 class Chart extends StatefulWidget {
-  final Object patientData;
+  final dynamic patientData;
   const Chart({super.key, required this.patientData});
 
   @override
@@ -10,13 +17,52 @@ class Chart extends StatefulWidget {
 }
 
 class _ChartState extends State<Chart> {
-  List<Object> patientDataLocal = [];
-
+  bool isLoading = true;
+  List<dynamic> data = [];
   @override
   void initState() {
+    getData();
     super.initState();
-    patientDataLocal.add(widget.patientData);
   }
+
+  Future<void> getData() async {
+    Variable.checkInternet((hasInternet) {
+      if (!hasInternet) {
+        setState(() {
+          isLoading = false;
+        });
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      } else {
+        Map<String, dynamic> parameters = {
+          "patient_id": widget.patientData["patient_id"],
+        };
+        HttpRequest(parameters: {"sqlCode": "T1352", "parameters": parameters})
+            .post()
+            .then((res) {
+          if (res == null) {
+            setState(() {
+              isLoading = false;
+            });
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else {
+            setState(() {
+              data = res["rows"];
+              isLoading = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  Future _refresh() async => setState(() {
+        isLoading = true;
+        getData();
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +79,25 @@ class _ChartState extends State<Chart> {
             color: Colors.black,
           ),
         ),
-        title: const Text(
-          'Charting',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+        title: Text(
+          'Charts',
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.black, fontSize: 16),
         ),
+        centerTitle: true,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarColor: Colors.white),
+        elevation: 0.5,
         actions: [
           InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: ((context) => AddChart(data: patientDataLocal)),
+                  builder: ((context) => AddChart(data: widget.patientData)),
                 ),
               );
             },
@@ -123,16 +173,16 @@ class _ChartState extends State<Chart> {
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
-                                  "John Doe",
-                                  style: TextStyle(
+                                  widget.patientData["full_name"],
+                                  style: const TextStyle(
                                       color: Colors.black87,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500),
                                   maxLines: 2,
                                 ),
-                                Text(
+                                const Text(
                                   "08/16/ 1998 8:00 PM",
                                   style: TextStyle(
                                       color: Colors.black54,
@@ -146,8 +196,8 @@ class _ChartState extends State<Chart> {
                         ),
                         const Divider(),
                         Row(
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               "Room No: ",
                               style: TextStyle(
                                   color: Colors.black54,
@@ -157,8 +207,8 @@ class _ChartState extends State<Chart> {
                             ),
                             Expanded(
                               child: Text(
-                                "1",
-                                style: TextStyle(
+                                '${widget.patientData["room_no"]}',
+                                style: const TextStyle(
                                     color: Colors.black87,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500),
@@ -171,8 +221,8 @@ class _ChartState extends State<Chart> {
                           height: 10,
                         ),
                         Row(
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               "Ward No: ",
                               style: TextStyle(
                                   color: Colors.black54,
@@ -182,8 +232,8 @@ class _ChartState extends State<Chart> {
                             ),
                             Expanded(
                               child: Text(
-                                "1",
-                                style: TextStyle(
+                                '${widget.patientData["ward_no"]}',
+                                style: const TextStyle(
                                     color: Colors.black87,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500),
@@ -196,6 +246,153 @@ class _ChartState extends State<Chart> {
                     ),
                   ),
                 ),
+
+                Expanded(
+                    child: Container(
+                  child: isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor),
+                        )
+                      : !isLoading && data.isEmpty
+                          ? GestureDetector(
+                              onTap: _refresh,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Center(
+                                    child:
+                                        Text('No data found! Tap to refresh')),
+                              ))
+                          : StretchingOverscrollIndicator(
+                              axisDirection: AxisDirection.down,
+                              child: RefreshIndicator(
+                                onRefresh: _refresh,
+                                child: ListView.builder(
+                                    itemCount: data.length,
+                                    padding: const EdgeInsets.only(top: 15),
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Column(
+                                        children: [
+                                          Material(
+                                            elevation: 1,
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            child: Container(
+                                              height: 200,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                color: Colors.primaries[
+                                                    Variable.colorIndex(
+                                                        data[index]
+                                                            ['chart_id'])],
+                                              ),
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              12),
+                                                      child: Text(
+                                                        "Task No: ${index + 1}",
+                                                        style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          15),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          15)),
+                                                          color: Colors.white,
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(12),
+                                                        child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                data[index][
+                                                                    'medic_name'],
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontSize:
+                                                                        18),
+                                                              ),
+                                                              Variable
+                                                                  .verticalSpace(
+                                                                      10),
+                                                              Text(
+                                                                'Date: ${data[index]['medic_date'].toString().split(' ')[0]}',
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                              Variable
+                                                                  .verticalSpace(
+                                                                      10),
+                                                              Text(
+                                                                'Time: ${data[index]['medic_date'].toString().split(' ')[1]}',
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                              Variable
+                                                                  .verticalSpace(
+                                                                      10),
+                                                              Text(
+                                                                'Nurse: ${data[index]['full_name']}',
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                            ]),
+                                                      ),
+                                                    )
+                                                  ]),
+                                            ),
+                                          ),
+                                          Variable.verticalSpace(10)
+                                        ],
+                                      );
+                                    }),
+                              ),
+                            ),
+                )),
 
                 // const Center(
                 //     child: Text(

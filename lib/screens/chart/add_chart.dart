@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +10,7 @@ import 'package:nurse_assistance/variables.dart';
 import 'package:nurse_assistance/widgets/custom_btn.dart';
 
 class AddChart extends StatefulWidget {
-  final List<dynamic> data;
+  final dynamic data;
   const AddChart({super.key, required this.data});
 
   @override
@@ -47,10 +46,9 @@ class _AddChartState extends State<AddChart> {
   @override
   void initState() {
     super.initState();
-    patientName.text = widget.data[0]["full_name"];
-    roomNo.text = "Room ${widget.data[0]["room_no"]}";
-    wardNo.text = "Ward ${widget.data[0]["ward_no"]}";
-    print(widget.data[0]["full_name"]);
+    patientName.text = widget.data["full_name"];
+    roomNo.text = "Room ${widget.data["room_no"]}";
+    wardNo.text = "Ward ${widget.data["ward_no"]}";
   }
 
   @override
@@ -68,14 +66,17 @@ class _AddChartState extends State<AddChart> {
             color: Colors.black,
           ),
         ),
-        title: const Text(
-          'Add Charting',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+        title: Text(
+          'Add Chart',
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.black, fontSize: 16),
         ),
+        centerTitle: true,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.light),
+        elevation: 0.5,
       ),
       body: SafeArea(
         child: Container(
@@ -113,7 +114,7 @@ class _AddChartState extends State<AddChart> {
                   Container(
                     height: 10,
                   ),
-                  Text("Room No"),
+                  const Text("Room No"),
                   Container(
                     height: 10,
                   ),
@@ -146,7 +147,7 @@ class _AddChartState extends State<AddChart> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Task 1",
                             style: TextStyle(
                                 color: Colors.black,
@@ -235,14 +236,13 @@ class _AddChartState extends State<AddChart> {
     Variable.checkInternet((hasInternet) async {
       if (hasInternet) {
         Map<String, dynamic> parameters = {
-          "patient_id": widget.data[0]["patient_id"],
+          "patient_id": widget.data["patient_id"],
           "nurse_id": Variable.userInfo["personnel_id"],
-          "room_no": widget.data[0]["room_no"],
-          "ward_no": widget.data[0]["ward_no"],
+          "room_no": widget.data["room_no"],
+          "ward_no": widget.data["ward_no"],
           "medic_name": medicName.text,
           "medic_date": dateTimeValue.toString().split(".")[0],
         };
-        print("parameters $parameters");
 
         HttpRequest(parameters: {"sqlCode": "T1351", "parameters": parameters})
             .post()

@@ -1,13 +1,72 @@
+import 'dart:isolate';
+
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/messages.dart';
+import 'package:nurse_assistance/notification_service.dart';
 import 'package:nurse_assistance/variables.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../chart/charting.dart';
+
+@pragma('vm:entry-point')
+void initilizeBackgroundService() async {
+  NotificationServices notificationServices = NotificationServices();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String personnelId = prefs.getString("PERSONNELID") ?? "0";
+  final DateTime now = DateTime.now();
+  final int isolateId = Isolate.current.hashCode;
+
+  notificationServices.initializeNotifications();
+
+  int notifId = prefs.getInt("notification_id") ?? 0;
+  int nNotifId = notifId + 1;
+
+  prefs.setInt("notification_id", nNotifId);
+  //notificationServices.sendNotification(nNotifId, 'Admin', item["message"]);
+
+  if (int.parse(personnelId) == 0) return;
+
+  Variable.checkInternet((hasInternet) {
+    if (!hasInternet) {
+    } else {
+      var mapMsg = <String, dynamic>{};
+
+      //mapMsg["lastsync"] = lastSyncMsg;
+      mapMsg["nurse_id"] = int.parse(personnelId);
+
+      Map<String, dynamic> parameters = {
+        "nurse_id": Variable.userInfo["personnel_id"],
+      };
+
+      HttpRequest(parameters: {"sqlCode": "T1353", "parameters": parameters})
+          .post()
+          .then((res) async {
+        if (res == null) {
+        } else {
+          for (var item in res["rows"]) {
+            if (Variable.numSeconds(item["medic_date"]) <= 0) {
+              int notifId = prefs.getInt("notification_id") ?? 0;
+              int nNotifId = notifId + 1;
+
+              prefs.setInt("notification_id", nNotifId);
+              notificationServices.sendNotification(
+                  nNotifId, 'Admin', item["message"]);
+
+              await Variable.flutterTts
+                  .speak('Patumara ang pasyenti sa room 201 ug paracetamol.');
+            }
+          }
+        }
+      });
+    }
+  });
+}
 
 class NurseDashboard extends StatefulWidget {
   const NurseDashboard({super.key});
@@ -25,6 +84,15 @@ class _NurseDashboardState extends State<NurseDashboard> {
   void initState() {
     super.initState();
     getData();
+  }
+
+  Future<void> initiateNotify() async {
+    await AndroidAlarmManager.initialize();
+    const int helloAlarmID = 0;
+
+    await AndroidAlarmManager.periodic(
+        const Duration(seconds: 3), helloAlarmID, initilizeBackgroundService,
+        startAt: DateTime.now());
   }
 
   Future<void> getData() async {
@@ -123,9 +191,9 @@ class _NurseDashboardState extends State<NurseDashboard> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "Addrian M. Mamar",
-                                  style: TextStyle(
+                                Text(
+                                  Variable.userInfo["full_name"],
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 20,

@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class Variable {
   static String userName = '';
   static String password = '';
   static dynamic userInfo;
   static int orNo = 0;
+  static FlutterTts flutterTts = FlutterTts();
   static int colorIndex(int index) {
     return index > 17
         ? int.parse(index.toString()[(index.toString().length - 1)]) < 17
@@ -90,5 +92,16 @@ class Variable {
     } on SocketException catch (_) {
       callBack(false);
     }
+  }
+
+  static int numSeconds(String date) {
+    int res = 0;
+
+    final eventDate = DateTime.parse(date);
+    final today = DateTime.now();
+
+    res = eventDate.difference(today).inSeconds;
+
+    return res;
   }
 }

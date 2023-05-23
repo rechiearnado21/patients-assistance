@@ -24,6 +24,9 @@ dependencies:
   molten_navigationbar_flutter: ^1.0.0
   shared_preferences: ^2.0.15
   lottie: ^2.2.0
+  flutter_local_notifications: ^14.1.0
+  android_alarm_manager_plus: ^3.0.1
+  permission_handler: ^10.2.0 
 
 dev_dependencies:
   flutter_test:
