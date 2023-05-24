@@ -567,7 +567,7 @@ class _PatientDetailsState extends State<PatientDetails>
                                               ),
                                               Variable.verticalSpace(10),
                                               Text(
-                                                'Encoded by: ${dataMonitoringTask[index]['full_name']}',
+                                                'Encoded by: ${dataMonitoringTask[index]['nurse_name']}',
                                                 style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 13),

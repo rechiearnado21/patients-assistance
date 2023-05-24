@@ -121,242 +121,255 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     var size = MediaQuery.of(context).size;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
-      child: Scaffold(
-        backgroundColor: const Color(0xFF06919d),
-        appBar: AppBar(
-          toolbarHeight: 0,
+      child: WillPopScope(
+        onWillPop: () async {
+          CustomDialog(
+              title: 'Hang on',
+              message: 'Are you sure you want to close the app?',
+              onTap: () {
+                SystemNavigator.pop();
+              }).defaultDialog();
+          return false;
+        },
+        child: Scaffold(
           backgroundColor: const Color(0xFF06919d),
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFF06919d),
-            statusBarIconBrightness: Brightness.light,
+          appBar: AppBar(
+            toolbarHeight: 0,
+            backgroundColor: const Color(0xFF06919d),
+            systemOverlayStyle: const SystemUiOverlayStyle(
+              statusBarColor: Color(0xFF06919d),
+              statusBarIconBrightness: Brightness.light,
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
-        ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: const Color.fromARGB(255, 246, 248, 249),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: size.width,
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF06919d),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
+          body: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            color: const Color.fromARGB(255, 246, 248, 249),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: size.width,
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF06919d),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: ((context) =>
+                                            const UpdateProfile()),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: AssetImage(
+                                              "assets/images/doctora.png"),
+                                        )),
+                                  ),
+                                ),
+                                Container(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      AutoSizeText(
+                                        "${Variable.userInfo["full_name"]}",
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 17),
+                                        maxFontSize: 20,
+                                      ),
+                                      Container(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "${myType(Variable.userInfo["role_id"])}/${myDept(Variable.userInfo["department_id"])}",
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 15,
+                                        ),
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: ((context) => const PatientList()),
+                                ),
+                              );
+                            },
+                            child: const Card(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(80))),
+                              child: Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Icon(
+                                  Icons.people,
+                                  color: Colors.purple,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Container(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 10),
+                        child: TextField(
+                            focusNode: searchFocusNode,
+                            controller: controller,
+                            decoration: InputDecoration(
+                              fillColor: Colors.white,
+                              filled: true,
+                              hintText: 'Search',
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.only(left: 20),
+                              hintStyle: const TextStyle(color: Colors.black54),
+                              suffixIcon: InkWell(
+                                onTap: filter.isEmpty
+                                    ? () {
+                                        searchFocusNode.requestFocus();
+                                      }
+                                    : () {
+                                        controller.clear();
+                                        setState(() {
+                                          filter = '';
+                                        });
+                                        FocusScope.of(context)
+                                            .requestFocus(FocusNode());
+                                      },
+                                child: filter.isEmpty
+                                    ? const Icon(Icons.search)
+                                    : const Icon(Icons.close),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                filter = value;
+                              });
+                              // text = text.toLowerCase();
+                              // setState(() {
+                              //   ctr = 0;
+                              //   if (text.isEmpty) {
+                              //     _data = widget.data;
+                              //   }
+                              //   _data = _data.where((areaName) {
+                              //     var noteTitle = areaName.parkAreaName
+                              //         .toString()
+                              //         .toLowerCase();
+                              //     return noteTitle.contains(text);
+                              //   }).toList();
+                              // });
+                            }),
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: ((context) =>
-                                          const UpdateProfile()),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: AssetImage(
-                                            "assets/images/doctora.png"),
-                                      )),
-                                ),
-                              ),
-                              Container(
-                                width: 10,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AutoSizeText(
-                                      "${Variable.userInfo["full_name"]}",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 17),
-                                      maxFontSize: 20,
-                                    ),
-                                    Container(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      "${myType(Variable.userInfo["role_id"])}/${myDept(Variable.userInfo["department_id"])}",
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 15,
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.calendar_today,
+                            color: Color.fromARGB(255, 7, 182, 235),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: ((context) => const PatientList()),
-                              ),
-                            );
-                          },
-                          child: const Card(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(80))),
-                            child: Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Icon(
-                                Icons.people,
-                                color: Colors.purple,
-                              ),
+                          Text(
+                            ' ${DateFormat.yMMMd().format(DateTime.now())}',
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
                             ),
                           ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor),
                         )
-                      ],
-                    ),
-                    Container(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 10),
-                      child: TextField(
-                          focusNode: searchFocusNode,
-                          controller: controller,
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            filled: true,
-                            hintText: 'Search',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            hintStyle: const TextStyle(color: Colors.black54),
-                            suffixIcon: InkWell(
-                              onTap: filter.isEmpty
-                                  ? () {
-                                      searchFocusNode.requestFocus();
-                                    }
-                                  : () {
-                                      controller.clear();
-                                      setState(() {
-                                        filter = '';
-                                      });
-                                      FocusScope.of(context)
-                                          .requestFocus(FocusNode());
-                                    },
-                              child: filter.isEmpty
-                                  ? const Icon(Icons.search)
-                                  : const Icon(Icons.close),
-                            ),
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              filter = value;
-                            });
-                            // text = text.toLowerCase();
-                            // setState(() {
-                            //   ctr = 0;
-                            //   if (text.isEmpty) {
-                            //     _data = widget.data;
-                            //   }
-                            //   _data = _data.where((areaName) {
-                            //     var noteTitle = areaName.parkAreaName
-                            //         .toString()
-                            //         .toLowerCase();
-                            //     return noteTitle.contains(text);
-                            //   }).toList();
-                            // });
-                          }),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.calendar_today,
-                          color: Color.fromARGB(255, 7, 182, 235),
-                        ),
-                        Text(
-                          ' ${DateFormat.yMMMd().format(DateTime.now())}',
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                            color: Theme.of(context).primaryColor),
-                      )
-                    : !isLoading && data.isEmpty
-                        ? GestureDetector(
-                            onTap: _refresh,
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: Center(
-                                  child: Text('No data found! Tap to refresh')),
-                            ))
-                        : StretchingOverscrollIndicator(
-                            axisDirection: AxisDirection.down,
-                            child: RefreshIndicator(
-                              onRefresh: _refresh,
-                              child: ListView.builder(
-                                  itemCount: data.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    if (filter.isEmpty) {
-                                      return lamingaNurse(data[index]);
-                                    } else {
-                                      if (data[index]['full_name']
-                                          .toLowerCase()
-                                          .contains(filter.toLowerCase())) {
+                      : !isLoading && data.isEmpty
+                          ? GestureDetector(
+                              onTap: _refresh,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Center(
+                                    child:
+                                        Text('No data found! Tap to refresh')),
+                              ))
+                          : StretchingOverscrollIndicator(
+                              axisDirection: AxisDirection.down,
+                              child: RefreshIndicator(
+                                onRefresh: _refresh,
+                                child: ListView.builder(
+                                    itemCount: data.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      if (filter.isEmpty) {
                                         return lamingaNurse(data[index]);
                                       } else {
-                                        return const SizedBox();
+                                        if (data[index]['full_name']
+                                            .toLowerCase()
+                                            .contains(filter.toLowerCase())) {
+                                          return lamingaNurse(data[index]);
+                                        } else {
+                                          return const SizedBox();
+                                        }
                                       }
-                                    }
-                                  }),
+                                    }),
+                              ),
                             ),
-                          ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

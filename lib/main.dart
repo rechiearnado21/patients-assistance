@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,17 +14,38 @@ import 'database/notifications_table.dart';
 import 'http_request.dart';
 
 @pragma('vm:entry-point')
+void oneShotAlarm() async {
+  NotificationServices notificationServices = NotificationServices();
+  await NotificationDatabase.instance
+      .readAllNotifications()
+      .then((value) async {
+    for (dynamic item in value) {
+      if (Variable.numSeconds(item["medic_date"]) <= 0 &&
+          Variable.numSeconds(item["medic_date"]) >= -30) {
+        notificationServices.sendNotification(
+            item["chart_id"], item["patient_name"], item["medic_name"]);
+
+        await Variable.flutterTts.speak(item["medic_name"]);
+        Timer(const Duration(seconds: 4), () async {
+          await Variable.flutterTts.speak(item["medic_name"]);
+          Timer(const Duration(seconds: 4), () async {
+            await Variable.flutterTts.speak(item["medic_name"]);
+          });
+        });
+      }
+    }
+  });
+}
+
+@pragma('vm:entry-point')
 void initilizeBackgroundService() async {
   NotificationServices notificationServices = NotificationServices();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   final String personnelId = prefs.getString("PERSONNELID") ?? "0";
+  final String lastSyncDatetime = prefs.getString("LASTSYNCDATETIME") ??
+      DateTime.now().toString().split('.')[0];
 
   notificationServices.initializeNotifications();
-
-  int notifId = prefs.getInt("notification_id") ?? 0;
-  int nNotifId = notifId + 1;
-
-  prefs.setInt("notification_id", nNotifId);
 
   if (int.parse(personnelId) == 0 || int.parse(personnelId) == 1) return;
 
@@ -31,35 +54,31 @@ void initilizeBackgroundService() async {
     } else {
       var parameters = <String, dynamic>{};
 
-      parameters["in_dt"] = DateTime.now().toString().split(' ')[0];
+      parameters["in_dt"] = lastSyncDatetime;
       parameters["nurse_id"] = int.parse(personnelId);
 
       HttpRequest(parameters: {"sqlCode": "T1353", "parameters": parameters})
           .post()
           .then((res) async {
         if (res == null) {
-        } else if (!res["isSuccess"]) {
+        } else if (res["isSuccess"].toString() == "false") {
         } else {
+          prefs.setString(
+              "LASTSYNCDATETIME", DateTime.now().toString().split('.')[0]);
           for (var item in res["rows"]) {
-            if (Variable.numSeconds(item["medic_date"]) <= 53) {
-              await NotificationDatabase.instance
-                  .readNotificationById(item['chart_id'])
-                  .then((value) async {
-                if (value != null) {
-                } else {
-                  int notifId = prefs.getInt("notification_id") ?? 0;
-                  int nNotifId = notifId + 1;
+            await NotificationDatabase.instance
+                .readNotificationById(item['chart_id'])
+                .then((value) async {
+              if (value != null) {
+              } else {
+                await NotificationDatabase.instance.insertUpdate(item);
 
-                  prefs.setInt("notification_id", nNotifId);
-                  await NotificationDatabase.instance.insertUpdate(item);
-
-                  notificationServices.sendNotification(
-                      nNotifId, item["patient_name"], item["medic_name"]);
-
-                  await Variable.flutterTts.speak(item["medic_name"]);
-                }
-              });
-            }
+                await AndroidAlarmManager.oneShotAt(
+                    DateTime.parse(item['medic_date']),
+                    item['chart_id'],
+                    oneShotAlarm);
+              }
+            });
           }
         }
       });

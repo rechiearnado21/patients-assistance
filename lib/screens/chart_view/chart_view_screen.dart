@@ -203,7 +203,7 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                                       ),
                                       Variable.verticalSpace(10),
                                       Text(
-                                        'Nurse: ${Variable.userInfo['full_name']}',
+                                        'Encoded By: ${Variable.userInfo['full_name']}',
                                         style: const TextStyle(
                                             color: Colors.black, fontSize: 14),
                                       ),

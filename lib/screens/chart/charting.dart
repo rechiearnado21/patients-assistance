@@ -1,14 +1,45 @@
+import 'dart:async';
+
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:nurse_assistance/notification_service.dart';
 import 'package:nurse_assistance/screens/chart/add_chart.dart';
 import 'package:nurse_assistance/screens/chart_view_order/chart_view_order_screen.dart';
 
+import '../../database/notifications_table.dart';
 import '../../dialogs.dart';
 import '../../http_request.dart';
 import '../../messages.dart';
 import '../../variables.dart';
+
+@pragma('vm:entry-point')
+void oneShotAlarm() async {
+  NotificationServices notificationServices = NotificationServices();
+
+  await NotificationDatabase.instance
+      .readAllNotifications()
+      .then((value) async {
+    for (dynamic item in value) {
+      if (Variable.numSeconds(item["medic_date"]) <= 10 &&
+          Variable.numSeconds(item["medic_date"]) >= -30) {
+        notificationServices.sendNotification(
+            item["chart_id"], item["patient_name"], item["medic_name"]);
+
+        await Variable.flutterTts.speak(item["medic_name"]);
+
+        Timer(const Duration(seconds: 4), () async {
+          await Variable.flutterTts.speak(item["medic_name"]);
+          Timer(const Duration(seconds: 4), () async {
+            await Variable.flutterTts.speak(item["medic_name"]);
+          });
+        });
+      }
+    }
+  });
+}
 
 class Chart extends StatefulWidget {
   final dynamic patientData;
@@ -42,7 +73,7 @@ class _ChartState extends State<Chart> {
         };
         HttpRequest(parameters: {"sqlCode": "T1352", "parameters": parameters})
             .post()
-            .then((res) {
+            .then((res) async {
           if (res == null) {
             setState(() {
               isLoading = false;
@@ -55,6 +86,24 @@ class _ChartState extends State<Chart> {
               data = res["rows"];
               isLoading = false;
             });
+
+            for (var item in res["rows"]) {
+              if (item['is_done'] != 'Y') {
+                await NotificationDatabase.instance
+                    .readNotificationById(item['chart_id'])
+                    .then((value) async {
+                  if (value != null) {
+                  } else {
+                    await NotificationDatabase.instance.insertUpdate(item);
+
+                    await AndroidAlarmManager.oneShotAt(
+                        DateTime.parse(item['medic_date']),
+                        item['chart_id'],
+                        oneShotAlarm);
+                  }
+                });
+              }
+            }
           }
         });
       }
@@ -376,7 +425,7 @@ class _ChartState extends State<Chart> {
                                                         Variable.verticalSpace(
                                                             10),
                                                         Text(
-                                                          'Encoded By: ${data[index]['full_name']}',
+                                                          'Encoded By: ${data[index]['nurse_name']}',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors

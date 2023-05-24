@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../dialogs.dart';
@@ -56,6 +57,12 @@ class _LoginBodyScreenState extends State<LoginBodyScreen>
         key: scaffoldMessengerKey,
         child: WillPopScope(
           onWillPop: () async {
+            CustomDialog(
+                title: 'Hang on',
+                message: 'Are you sure you want to close the app?',
+                onTap: () {
+                  SystemNavigator.pop();
+                }).defaultDialog();
             return false;
           },
           child: Scaffold(

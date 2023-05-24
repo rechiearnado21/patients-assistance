@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:molten_navigationbar_flutter/molten_navigationbar_flutter.dart';
+import '../../dialogs.dart';
 import '../dashboard_nurse/nurse_dashboard.dart';
 import 'controller.dart';
 
@@ -41,9 +42,20 @@ class _LandingBodyScreenState extends State<LandingBodyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: bottomBarPages[pageIndex],
-      extendBody: true,
+    return WillPopScope(
+      onWillPop: () async {
+        CustomDialog(
+            title: 'Hang on',
+            message: 'Are you sure you want to close the app?',
+            onTap: () {
+              SystemNavigator.pop();
+            }).defaultDialog();
+        return false;
+      },
+      child: Scaffold(
+        body: bottomBarPages[pageIndex],
+        extendBody: true,
+      ),
     );
   }
 }

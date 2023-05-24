@@ -62,11 +62,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         elevation: 0.5,
         actions: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    height: 10,
+                    width: 10,
+                    color: Colors.amber,
+                  ),
+                  Variable.verticalSpace(5),
                   Container(
                     height: 10,
                     width: 10,
@@ -86,13 +93,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
+                    "Early",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 10,
+                    ),
+                  ),
+                  Variable.verticalSpace(3),
+                  const Text(
                     "On Time",
                     style: TextStyle(
                       color: Colors.black54,
                       fontSize: 10,
                     ),
                   ),
-                  Variable.verticalSpace(5),
+                  Variable.verticalSpace(3),
                   const Text(
                     "Late",
                     style: TextStyle(
@@ -157,7 +172,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                           width: 10,
                                           color: numMinutes >= 5
                                               ? Colors.red
-                                              : Colors.green,
+                                              : numMinutes <= -1
+                                                  ? Colors.amber
+                                                  : Colors.green,
                                         ),
                                         title: Text(
                                           '${data[index]['patient_name']} ',
