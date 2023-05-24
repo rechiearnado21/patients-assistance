@@ -14,6 +14,7 @@ import '../../dialogs.dart';
 import '../../http_request.dart';
 import '../../messages.dart';
 import '../../variables.dart';
+import '../chart_view/chart_view_screen.dart';
 
 @pragma('vm:entry-point')
 void oneShotAlarm() async {
@@ -325,119 +326,138 @@ class _ChartState extends State<Chart> {
                                       horizontal: 20.0, vertical: 15),
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return Column(
-                                      children: [
-                                        Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                  color: Colors.grey.shade300)),
-                                          child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        "Task No: ${index + 1}",
-                                                        style: const TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                      data[index]['is_done'] ==
-                                                              'Y'
-                                                          ? const Icon(
-                                                              Icons
-                                                                  .check_circle_outline_outlined,
-                                                              color:
-                                                                  Colors.green,
-                                                            )
-                                                          : Variable
-                                                              .horizontalSpace(
-                                                                  1)
-                                                    ],
+                                    return GestureDetector(
+                                      onTap: data[index]['is_done'] == 'Y'
+                                          ? null
+                                          : () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ChartViewScreen(
+                                                    patientData: data[index],
+                                                    callBack: _refresh,
                                                   ),
                                                 ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                  child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                              );
+                                            },
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                color: Colors.white,
+                                                border: Border.all(
+                                                    color:
+                                                        Colors.grey.shade300)),
+                                            child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
                                                         Text(
-                                                          data[index]
-                                                              ['medic_name'],
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontSize: 14),
+                                                          "Task No: ${index + 1}",
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
                                                         ),
-                                                        Variable.verticalSpace(
-                                                            10),
-                                                        Text(
-                                                          'Date: ${DateFormat.yMMMMd('en_US').format(DateTime.parse(data[index]['medic_date']))}',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 13),
-                                                        ),
-                                                        Variable.verticalSpace(
-                                                            10),
-                                                        Text(
-                                                          'Time: ${DateFormat.jm().format(DateTime.parse(data[index]['medic_date']))}',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 13),
-                                                        ),
-                                                        Variable.verticalSpace(
-                                                            10),
-                                                        Text(
-                                                          'Status: ${data[index]['status'] == 'N' ? 'N/A' : data[index]['status']}',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 13),
-                                                        ),
-                                                        Variable.verticalSpace(
-                                                            10),
-                                                        Text(
-                                                          'Encoded By: ${data[index]['nurse_name']}',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 13),
-                                                        ),
-                                                      ]),
-                                                )
-                                              ]),
-                                        ),
-                                        Variable.verticalSpace(10)
-                                      ],
+                                                        data[index]['is_done'] ==
+                                                                'Y'
+                                                            ? const Icon(
+                                                                Icons
+                                                                    .check_circle_outline_outlined,
+                                                                color: Colors
+                                                                    .green,
+                                                              )
+                                                            : Variable
+                                                                .horizontalSpace(
+                                                                    1)
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
+                                                    child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            data[index]
+                                                                ['medic_name'],
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 14),
+                                                          ),
+                                                          Variable
+                                                              .verticalSpace(
+                                                                  10),
+                                                          Text(
+                                                            'Date: ${DateFormat.yMMMMd('en_US').format(DateTime.parse(data[index]['medic_date']))}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 13),
+                                                          ),
+                                                          Variable
+                                                              .verticalSpace(
+                                                                  10),
+                                                          Text(
+                                                            'Time: ${DateFormat.jm().format(DateTime.parse(data[index]['medic_date']))}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 13),
+                                                          ),
+                                                          Variable
+                                                              .verticalSpace(
+                                                                  10),
+                                                          Text(
+                                                            'Status: ${data[index]['status'] == 'N' ? 'N/A' : data[index]['status']}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 13),
+                                                          ),
+                                                          Variable
+                                                              .verticalSpace(
+                                                                  10),
+                                                          Text(
+                                                            'Encoded By: ${data[index]['nurse_name']}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 13),
+                                                          ),
+                                                        ]),
+                                                  )
+                                                ]),
+                                          ),
+                                          Variable.verticalSpace(10)
+                                        ],
+                                      ),
                                     );
                                   }),
                             ),

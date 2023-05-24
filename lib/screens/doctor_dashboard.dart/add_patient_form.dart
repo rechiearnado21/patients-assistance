@@ -1,11 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cupertino_datetime_picker/flutter_cupertino_datetime_picker.dart';
 import 'package:get/get.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
-import 'package:nurse_assistance/routes/routes.dart';
 import 'package:intl/intl.dart';
 import 'package:nurse_assistance/variables.dart';
 import 'package:nurse_assistance/widgets/custom_btn.dart';

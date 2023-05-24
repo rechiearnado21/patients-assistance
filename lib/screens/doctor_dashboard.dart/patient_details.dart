@@ -469,7 +469,6 @@ class _PatientDetailsState extends State<PatientDetails>
   }
 
   Widget patientMonitoringTab(size) {
-    print("isLoadingPatient $isLoadingPatient");
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: isLoadingPatient

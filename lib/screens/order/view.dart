@@ -59,10 +59,7 @@ class _OrderFormState extends State<OrderForm> {
     super.initState();
     dateTime = TextEditingController();
     order = TextEditingController();
-    rationale = TextEditingController();
-    print("dataObject ${widget.patientData}");
-
-    print("personel data ${Variable.userInfo}");
+    rationale = TextEditingController(); 
   }
 
   dateTimePickerWidget(BuildContext context) {

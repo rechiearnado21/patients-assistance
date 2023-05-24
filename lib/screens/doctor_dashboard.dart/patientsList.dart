@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nurse_assistance/dialogs.dart';
@@ -39,8 +41,7 @@ class _PatientListState extends State<PatientList> {
         };
         HttpRequest(parameters: {"sqlCode": "T1343", "parameters": parameters})
             .post()
-            .then((res) {
-          print("res $res");
+            .then((res) { 
           if (res == null) {
             setState(() {
               isLoading = false;

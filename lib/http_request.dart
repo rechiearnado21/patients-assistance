@@ -31,8 +31,7 @@ class HttpRequest {
         Uri.parse(
             Uri.decodeFull(Uri.https(ApiKey.apiKey, ApiKey.subApi).toString())),
         headers: {"Content-Type": "application/json"},
-        body: json.encode(parameters));
-    print('response.body ${response.body}');
+        body: json.encode(parameters)); 
     try {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

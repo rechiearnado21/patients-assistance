@@ -196,9 +196,6 @@ class _NurseDashboardState extends State<NurseDashboard> {
                       e["personnel_id"] != Variable.userInfo["personnel_id"])
                   .toList();
 
-              print("listOfNursedata $listOfNursedata");
-              //data["full_name"]
-
               loadingNurse = false;
             });
           }
@@ -722,7 +719,7 @@ class _NurseDashboardState extends State<NurseDashboard> {
                 ),
                 trailing: const Icon(Icons.keyboard_arrow_right),
               ),
-              Divider(),
+              const Divider(),
             ],
           ),
         ),

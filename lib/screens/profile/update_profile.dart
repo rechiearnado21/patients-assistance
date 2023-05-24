@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nurse_assistance/screens/login/index.dart';
+import 'package:nurse_assistance/database/notifications_table.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../dialogs.dart';
 import '../../http_request.dart';
@@ -107,15 +107,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         prefs.setString("email", "");
                         prefs.setString("password", "");
                         prefs.setString("PERSONNELID", "0");
+                        await NotificationDatabase.instance.deleteAll();
                         Timer(const Duration(seconds: 2), () {
                           Get.back();
                           Get.offAndToNamed(AppRoutes.login);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: ((context) => const LoginScreen()),
-                          //   ),
-                          // );
                         });
                       }).defaultDialog();
                 },
