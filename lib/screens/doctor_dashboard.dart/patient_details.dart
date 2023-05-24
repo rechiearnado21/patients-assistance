@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/messages.dart';
@@ -493,84 +494,87 @@ class _PatientDetailsState extends State<PatientDetails>
                         itemBuilder: (BuildContext context, int index) {
                           return Column(
                             children: [
-                              Material(
-                                elevation: 1,
-                                borderRadius: BorderRadius.circular(15),
-                                child: Container(
-                                  height: 200,
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15),
-                                    color: Colors.primaries[Variable.colorIndex(
-                                        dataMonitoringTask[index]['chart_id'])],
-                                  ),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(12),
-                                          child: Text(
-                                            "Task No: ${index + 1}",
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(15),
-                                                  bottomRight:
-                                                      Radius.circular(15)),
-                                              color: Colors.white,
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300)),
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Task No: ${index + 1}",
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500),
                                             ),
-                                            padding: const EdgeInsets.all(12),
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    dataMonitoringTask[index]
-                                                        ['medic_name'],
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize: 18),
-                                                  ),
-                                                  Variable.verticalSpace(10),
-                                                  Text(
-                                                    'Date: ${dataMonitoringTask[index]['medic_date'].toString().split(' ')[0]}',
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 15),
-                                                  ),
-                                                  Variable.verticalSpace(10),
-                                                  Text(
-                                                    'Time: ${dataMonitoringTask[index]['medic_date'].toString().split(' ')[1]}',
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 15),
-                                                  ),
-                                                  Variable.verticalSpace(10),
-                                                  Text(
-                                                    'Nurse: ${dataMonitoringTask[index]['full_name']}',
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 15),
-                                                  ),
-                                                ]),
-                                          ),
-                                        )
-                                      ]),
-                                ),
+                                            dataMonitoringTask[index]
+                                                        ['is_done'] ==
+                                                    'Y'
+                                                ? const Icon(
+                                                    Icons
+                                                        .check_circle_outline_outlined,
+                                                    color: Colors.green,
+                                                  )
+                                                : Variable.horizontalSpace(1)
+                                          ],
+                                        ),
+                                      ),
+                                      const Divider(),
+                                      Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${dataMonitoringTask[index]['medic_name']}",
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 14),
+                                              ),
+                                              Variable.verticalSpace(10),
+                                              Text(
+                                                'Date: ${DateFormat.yMMMMd('en_US').format(DateTime.parse(dataMonitoringTask[index]['medic_date']))}',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                              ),
+                                              Variable.verticalSpace(10),
+                                              Text(
+                                                'Time: ${DateFormat.jm().format(DateTime.parse(dataMonitoringTask[index]['medic_date']))}',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                              ),
+                                              Variable.verticalSpace(10),
+                                              Text(
+                                                'Status: ${dataMonitoringTask[index]['status'] == 'N' ? 'N/A' : dataMonitoringTask[index]['status']}',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                              ),
+                                              Variable.verticalSpace(10),
+                                              Text(
+                                                'Encoded by: ${dataMonitoringTask[index]['full_name']}',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                              ),
+                                            ]),
+                                      )
+                                    ]),
                               ),
                               Variable.verticalSpace(10)
                             ],
