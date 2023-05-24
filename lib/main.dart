@@ -28,9 +28,9 @@ void oneShotAlarm() async {
         await Variable.flutterTts.speak(item["medic_name"]);
         Timer(const Duration(seconds: 4), () async {
           await Variable.flutterTts.speak(item["medic_name"]);
-          Timer(const Duration(seconds: 4), () async {
-            await Variable.flutterTts.speak(item["medic_name"]);
-          });
+          // Timer(const Duration(seconds: 4), () async {
+          //   await Variable.flutterTts.speak(item["medic_name"]);
+          // });
         });
       }
     }
