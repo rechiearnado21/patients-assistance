@@ -376,7 +376,7 @@ class _ChartState extends State<Chart> {
                                                         Variable.verticalSpace(
                                                             10),
                                                         Text(
-                                                          'Nurse: ${data[index]['full_name']}',
+                                                          'Encoded By: ${data[index]['full_name']}',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
