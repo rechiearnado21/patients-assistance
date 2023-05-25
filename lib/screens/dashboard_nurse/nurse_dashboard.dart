@@ -26,8 +26,6 @@ class NurseDashboard extends StatefulWidget {
 class _NurseDashboardState extends State<NurseDashboard> {
   bool isLoading = true;
   List<dynamic> data = [];
-  List<dynamic> listOfNursedata = [];
-  bool loadingNurse = true;
   String filter = '';
   TextEditingController controller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
@@ -37,7 +35,6 @@ class _NurseDashboardState extends State<NurseDashboard> {
   void initState() {
     getNotificationCount();
     getData();
-    getListOfNurse();
     initPlatformState();
     super.initState();
   }
@@ -143,10 +140,6 @@ class _NurseDashboardState extends State<NurseDashboard> {
         getData();
       });
 
-  Future _refreshNurse() async => setState(() {
-        loadingNurse = true;
-        getListOfNurse();
-      });
   void getNotificationCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -163,44 +156,6 @@ class _NurseDashboardState extends State<NurseDashboard> {
         });
         getNotificationCount();
       });
-    });
-  }
-
-  void getListOfNurse() async {
-    Variable.checkInternet((hasInternet) {
-      if (!hasInternet) {
-        setState(() {
-          loadingNurse = false;
-        });
-        CustomDialog(
-                message: Message.noInternet, isSuccess: false, isCancel: false)
-            .defaultDialog();
-      } else {
-        Map<String, dynamic> parameters = {
-          "department_id": Variable.userInfo["department_id"],
-        };
-        HttpRequest(parameters: {"sqlCode": "T1342", "parameters": parameters})
-            .post()
-            .then((res) {
-          if (res == null) {
-            setState(() {
-              loadingNurse = false;
-            });
-            CustomDialog(
-                    message: Message.error, isSuccess: false, isCancel: false)
-                .defaultDialog();
-          } else {
-            setState(() {
-              listOfNursedata = res["rows"]
-                  .where((e) =>
-                      e["personnel_id"] != Variable.userInfo["personnel_id"])
-                  .toList();
-
-              loadingNurse = false;
-            });
-          }
-        });
-      }
     });
   }
 
@@ -600,65 +555,14 @@ class _NurseDashboardState extends State<NurseDashboard> {
                         Variable.verticalSpace(15),
                         GestureDetector(
                           onTap: () {
-                            showModalBottomSheet<void>(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.60,
-                                  child: loadingNurse
-                                      ? Center(
-                                          child: CircularProgressIndicator(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        )
-                                      : !loadingNurse && listOfNursedata.isEmpty
-                                          ? GestureDetector(
-                                              onTap: _refreshNurse,
-                                              child: const Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20),
-                                                child: Center(
-                                                    child: Text(
-                                                        'No data found! Tap to refresh')),
-                                              ))
-                                          : StretchingOverscrollIndicator(
-                                              axisDirection: AxisDirection.down,
-                                              child: RefreshIndicator(
-                                                onRefresh: _refreshNurse,
-                                                child: ListView.builder(
-                                                    itemCount:
-                                                        listOfNursedata.length,
-                                                    itemBuilder:
-                                                        (BuildContext context,
-                                                            int index) {
-                                                      if (filter.isEmpty) {
-                                                        return listTileBottomSheet(
-                                                            listOfNursedata[
-                                                                index],
-                                                            data[
-                                                                'assigned_id']);
-                                                      } else {
-                                                        if (listOfNursedata[
-                                                                    index]
-                                                                ['full_name']
-                                                            .toLowerCase()
-                                                            .contains(filter
-                                                                .toLowerCase())) {
-                                                          return listTileBottomSheet(
-                                                              listOfNursedata[
-                                                                  index],
-                                                              data[
-                                                                  'assigned_id']);
-                                                        } else {
-                                                          return const SizedBox();
-                                                        }
-                                                      }
-                                                    }),
-                                              ),
-                                            ),
-                                );
-                              },
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: ((context) => RecommendationsScreen(
+                                      callBack: _refresh,
+                                      data: data,
+                                    )),
+                              ),
                             );
                           },
                           child: Container(
@@ -687,14 +591,316 @@ class _NurseDashboardState extends State<NurseDashboard> {
       ),
     );
   }
+}
 
-  Widget listTileBottomSheet(dataNurse, assId) {
+class RecommendationsScreen extends StatefulWidget {
+  const RecommendationsScreen(
+      {super.key, required this.callBack, required this.data});
+
+  final Function() callBack;
+  final dynamic data;
+
+  @override
+  State<RecommendationsScreen> createState() => _RecommendationsScreenState();
+}
+
+class _RecommendationsScreenState extends State<RecommendationsScreen> {
+  List<dynamic> listOfNursedata = [];
+  bool loadingNurse = true;
+  String filter = '';
+  TextEditingController controller = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    getListOfNurse();
+    super.initState();
+  }
+
+  void getListOfNurse() async {
+    Variable.checkInternet((hasInternet) {
+      if (!hasInternet) {
+        setState(() {
+          loadingNurse = false;
+        });
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      } else {
+        Map<String, dynamic> parameters = {
+          "department_id": Variable.userInfo["department_id"],
+        };
+        HttpRequest(parameters: {"sqlCode": "T1342", "parameters": parameters})
+            .post()
+            .then((res) {
+          if (res == null) {
+            setState(() {
+              loadingNurse = false;
+            });
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else {
+            setState(() {
+              listOfNursedata = res["rows"]
+                  .where((e) =>
+                      e["personnel_id"] != Variable.userInfo["personnel_id"])
+                  .toList();
+
+              loadingNurse = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  Future _refreshNurse() async => setState(() {
+        loadingNurse = true;
+        getListOfNurse();
+      });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(
+              Icons.clear,
+              color: Theme.of(context).primaryColor,
+              size: 30,
+            )),
+        title: Text(
+          'Recommend',
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: Colors.black, fontSize: 16),
+        ),
+        centerTitle: true,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarColor: Colors.white),
+        elevation: 0.5,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.grey.shade300)),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15)),
+                        border: Border.all(color: Colors.grey.shade300),
+                        color: Theme.of(context).primaryColor),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: AutoSizeText(
+                            widget.data["full_name"],
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                            maxLines: 2,
+                          ),
+                        ),
+                        Variable.horizontalSpace(1),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Room No: ${widget.data["room_no"]}",
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal),
+                          maxLines: 2,
+                        ),
+                        Container(
+                          height: 10,
+                        ),
+                        Text(
+                          "Ward No: ${widget.data["ward_no"]}",
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+            child: TextField(
+                focusNode: searchFocusNode,
+                controller: controller,
+                decoration: InputDecoration(
+                  fillColor: Colors.grey.shade100,
+                  filled: true,
+                  hintText: 'Search',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.only(left: 20),
+                  hintStyle: const TextStyle(color: Colors.black54),
+                  suffixIcon: InkWell(
+                    onTap: filter.isEmpty
+                        ? () {
+                            searchFocusNode.requestFocus();
+                          }
+                        : () {
+                            controller.clear();
+                            setState(() {
+                              filter = '';
+                            });
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          },
+                    child: filter.isEmpty
+                        ? const Icon(Icons.search)
+                        : const Icon(Icons.close),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    filter = value;
+                  });
+                }),
+          ),
+          const Divider(),
+          Expanded(
+            child: loadingNurse
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color: Theme.of(context).primaryColor),
+                  )
+                : !loadingNurse && listOfNursedata.isEmpty
+                    ? GestureDetector(
+                        onTap: _refreshNurse,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Center(
+                              child: Text('No data found! Tap to refresh')),
+                        ))
+                    : StretchingOverscrollIndicator(
+                        axisDirection: AxisDirection.down,
+                        child: RefreshIndicator(
+                          onRefresh: _refreshNurse,
+                          child: ListView.builder(
+                              itemCount: listOfNursedata.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                if (filter.isEmpty) {
+                                  return listTileBottomSheet(
+                                      listOfNursedata[index]);
+                                } else {
+                                  if (listOfNursedata[index]['full_name']
+                                      .toLowerCase()
+                                      .contains(filter.toLowerCase())) {
+                                    return listTileBottomSheet(
+                                        listOfNursedata[index]);
+                                  } else {
+                                    return const SizedBox();
+                                  }
+                                }
+                              }),
+                        ),
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> submitAssignedPatient(nurseData) async {
+    const CustomDialog(isCancel: false).loadingDialog();
+    // print(nurseData["personnel_id"]);
+    Variable.checkInternet((hasInternet) async {
+      if (hasInternet) {
+        Map<String, dynamic> parameters = {
+          "assigned_id": widget.data['assigned_id'],
+          "patient_id": widget.data['patient_id'],
+          "nurse_id": nurseData["personnel_id"],
+        };
+
+        HttpRequest(parameters: {"sqlCode": "T1349", "parameters": parameters})
+            .post()
+            .then((res) async {
+          if (res == null) {
+            Get.back();
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          } else if (res["rows"].isNotEmpty) {
+            if (res["rows"][0]["success"] == "Y") {
+              await NotificationDatabase.instance
+                  .deleteAllByNurseId(Variable.userInfo["personnel_id"])
+                  .then((value) {
+                Get.back();
+                widget.callBack();
+                CustomDialog(
+                    title: "Success",
+                    message: res["rows"][0]["msg"],
+                    isSuccess: false,
+                    isCancel: false,
+                    onTap: () {
+                      Get.back();
+                    }).defaultDialog();
+              });
+            } else {
+              CustomDialog(
+                      message: res["rows"][0]["msg"],
+                      isSuccess: false,
+                      isCancel: false)
+                  .defaultDialog();
+            }
+          } else {
+            Get.back();
+
+            CustomDialog(
+                    message: Message.error, isSuccess: false, isCancel: false)
+                .defaultDialog();
+          }
+        });
+      } else {
+        Get.back();
+        CustomDialog(
+                message: Message.noInternet, isSuccess: false, isCancel: false)
+            .defaultDialog();
+      }
+    });
+  }
+
+  Widget listTileBottomSheet(dataNurse) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: GestureDetector(
-        onTap: () {
-          submitAssignedPatient(assId, dataNurse);
-        },
+        onTap: () => CustomDialog(
+            title: 'Hang on',
+            message: 'Are you sure you want to recommend this patient?',
+            onTap: () => submitAssignedPatient(dataNurse)).defaultDialog(),
         child: Container(
           color: Colors.white,
           child: Column(
@@ -725,59 +931,5 @@ class _NurseDashboardState extends State<NurseDashboard> {
         ),
       ),
     );
-  }
-
-  Future<void> submitAssignedPatient(assId, nurseData) async {
-    const CustomDialog(isCancel: false).loadingDialog();
-    // print(nurseData["personnel_id"]);
-    Variable.checkInternet((hasInternet) async {
-      if (hasInternet) {
-        Map<String, dynamic> parameters = {
-          "assigned_id": assId,
-          "nurse_id": nurseData["personnel_id"],
-        };
-
-        HttpRequest(parameters: {"sqlCode": "T1349", "parameters": parameters})
-            .post()
-            .then((res) async {
-          if (res == null) {
-            Get.back();
-            CustomDialog(
-                    message: Message.error, isSuccess: false, isCancel: false)
-                .defaultDialog();
-          } else if (res["rows"].isNotEmpty) {
-            Get.back();
-            if (res["rows"][0]["success"] == "Y") {
-              CustomDialog(
-                  title: "Success",
-                  message: res["rows"][0]["msg"],
-                  isSuccess: false,
-                  isCancel: false,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    getData();
-                  }).defaultDialog();
-            } else {
-              CustomDialog(
-                      message: res["rows"][0]["msg"],
-                      isSuccess: false,
-                      isCancel: false)
-                  .defaultDialog();
-            }
-          } else {
-            Get.back();
-
-            CustomDialog(
-                    message: Message.error, isSuccess: false, isCancel: false)
-                .defaultDialog();
-          }
-        });
-      } else {
-        Get.back();
-        CustomDialog(
-                message: Message.noInternet, isSuccess: false, isCancel: false)
-            .defaultDialog();
-      }
-    });
   }
 }

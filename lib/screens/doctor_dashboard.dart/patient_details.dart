@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
@@ -151,28 +152,28 @@ class _PatientDetailsState extends State<PatientDetails>
                 ),
               ),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF06919d),
+          backgroundColor: Colors.white,
+          leading: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: Icon(
+                Icons.clear,
+                color: Theme.of(context).primaryColor,
+                size: 30,
+              )),
+          title: Text(
+            'Patient Details',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: Colors.black, fontSize: 16),
+          ),
+          centerTitle: true,
           systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFF06919d),
-            statusBarIconBrightness: Brightness.light,
-          ),
-          elevation: 0,
-          leading: InkWell(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-          ),
-          title: const Text(
-            "Patient Details",
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-            ),
-          ),
+              statusBarIconBrightness: Brightness.dark,
+              statusBarColor: Colors.white),
+          elevation: 0.5,
         ),
         body: SafeArea(
           child: Container(
@@ -261,7 +262,7 @@ class _PatientDetailsState extends State<PatientDetails>
                                   height: 10,
                                 ),
                                 Text(
-                                    "BirthDate: ${dataPatient[0]["birth_date"]}"),
+                                    "BirthDate: ${DateFormat.yMMMMd('en_US').format(DateTime.parse(dataPatient[0]["birth_date"]))}"),
                                 Container(
                                   height: 10,
                                 ),
@@ -510,13 +511,18 @@ class _PatientDetailsState extends State<PatientDetails>
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              "Task No: ${index + 1}",
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500),
+                                            Expanded(
+                                              child: AutoSizeText(
+                                                dataMonitoringTask[index]
+                                                    ['medic_name'],
+                                                maxFontSize: 14,
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 14),
+                                              ),
                                             ),
+                                            Variable.horizontalSpace(10),
                                             dataMonitoringTask[index]
                                                         ['is_done'] ==
                                                     'Y'
@@ -537,14 +543,6 @@ class _PatientDetailsState extends State<PatientDetails>
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "${dataMonitoringTask[index]['medic_name']}",
-                                                style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 14),
-                                              ),
-                                              Variable.verticalSpace(10),
-                                              Text(
                                                 'Date: ${DateFormat.yMMMMd('en_US').format(DateTime.parse(dataMonitoringTask[index]['medic_date']))}',
                                                 style: const TextStyle(
                                                     color: Colors.black,
@@ -559,6 +557,13 @@ class _PatientDetailsState extends State<PatientDetails>
                                               ),
                                               Variable.verticalSpace(10),
                                               Text(
+                                                'Medication: ${dataMonitoringTask[index]['meal'] == 'N' ? 'N/A' : dataMonitoringTask[index]['meal']}',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                              ),
+                                              Variable.verticalSpace(10),
+                                              Text(
                                                 'Status: ${dataMonitoringTask[index]['status'] == 'N' ? 'N/A' : dataMonitoringTask[index]['status']}',
                                                 style: const TextStyle(
                                                     color: Colors.black,
@@ -566,7 +571,7 @@ class _PatientDetailsState extends State<PatientDetails>
                                               ),
                                               Variable.verticalSpace(10),
                                               Text(
-                                                'Encoded by: ${dataMonitoringTask[index]['nurse_name']}',
+                                                'Encoded By: ${dataMonitoringTask[index]['encoded_by_name'].isEmpty ? 'N/A' : dataMonitoringTask[index]['encoded_by_name']}',
                                                 style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 13),

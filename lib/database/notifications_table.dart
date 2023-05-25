@@ -155,6 +155,12 @@ CREATE TABLE ${Variable.notificationTable} (
     db!.delete(Variable.notificationTable, where: 'chart_id = $id');
   }
 
+  Future deleteAllByNurseId(int id) async {
+    final db = await instance.database;
+
+    db!.delete(Variable.notificationTable, where: 'nurse_id = $id');
+  }
+
   Future close() async {
     final db = await instance.database;
 

@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:nurse_assistance/variables.dart';
 import 'package:nurse_assistance/widgets/custom_btn.dart';
 
+import '../../functions.dart';
 import '../../messages.dart';
 
 class AddPatient extends StatefulWidget {
@@ -34,6 +35,7 @@ class _AddPatientState extends State<AddPatient> {
   String? roomNo;
   String? wardNo;
   String? gender;
+  bool _isDisabled = true;
   List<dynamic> roomData = [
     {"room": "Room 1", "value": 1},
     {"room": "Room 2", "value": 2},
@@ -57,6 +59,19 @@ class _AddPatientState extends State<AddPatient> {
     {"gender": "Female", "value": "f"},
     {"gender": "Male", "value": "m"},
   ];
+
+  final List<dynamic> _data = [
+    {"cname": "full_name", "value": "", "is_required": true},
+    {"cname": "address", "value": "", "is_required": true},
+    {"cname": "birth_date", "value": "", "is_required": true},
+    {"cname": "mobile_no", "value": "", "is_required": true},
+    {"cname": "age", "value": "", "is_required": true},
+    {"cname": "gender", "value": "", "is_required": true},
+    {"cname": "diagnosis", "value": "", "is_required": true},
+    {"cname": "room_no", "value": "", "is_required": true},
+    {"cname": "ward_no", "value": "", "is_required": true},
+  ];
+
   List<dynamic> doctorsOrder = [];
   String parsedDate(String date) {
     final DateFormat displayFormater = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
@@ -99,40 +114,28 @@ class _AddPatientState extends State<AddPatient> {
         //   ),
         // ),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF06919d),
+          backgroundColor: Colors.white,
+          leading: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: Icon(
+                Icons.clear,
+                color: Theme.of(context).primaryColor,
+                size: 30,
+              )),
+          title: Text(
+            'Add Patient',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: Colors.black, fontSize: 16),
+          ),
+          centerTitle: true,
           systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFF06919d),
-            statusBarIconBrightness: Brightness.light,
-          ),
-          elevation: 0,
-          leading: InkWell(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-          ),
-          title: const Text(
-            "Add Patient",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          // actions: [
-          //   IconButton(
-          //     onPressed: () {},
-          //     icon: const Icon(
-          //       Icons.add,
-          //       color: Colors.white,
-          //       size: 30,
-          //     ),
-          //   ),
-          //   Container(
-          //     width: 10,
-          //   ),
-          // ],
+              statusBarIconBrightness: Brightness.dark,
+              statusBarColor: Colors.white),
+          elevation: 0.5,
         ),
         body: SafeArea(
           child: Container(
@@ -175,7 +178,12 @@ class _AddPatientState extends State<AddPatient> {
                             color: Colors.black,
                             fontWeight: FontWeight.normal,
                           ),
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              _isDisabled = PublicFunction.validate(
+                                  'full_name', value, _data);
+                            });
+                          },
                         ),
                         Container(
                           height: 15,
@@ -195,7 +203,12 @@ class _AddPatientState extends State<AddPatient> {
                             color: Colors.black,
                             fontWeight: FontWeight.normal,
                           ),
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              _isDisabled = PublicFunction.validate(
+                                  'address', value, _data);
+                            });
+                          },
                         ),
                         Container(
                           height: 15,
@@ -235,14 +248,19 @@ class _AddPatientState extends State<AddPatient> {
                             border: Variable.myinputborder(),
                             enabledBorder: Variable.myinputborder(),
                             focusedBorder: Variable.myfocusborder(),
-                            label: const Text("Mobile"),
+                            label: const Text("Mobile No."),
                             floatingLabelBehavior: FloatingLabelBehavior.always,
                           ),
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.normal,
                           ),
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              _isDisabled = PublicFunction.validate(
+                                  'mobile_no', value, _data);
+                            });
+                          },
                         ),
                         Container(
                           height: 15,
@@ -267,7 +285,12 @@ class _AddPatientState extends State<AddPatient> {
                                   color: Colors.black,
                                   fontWeight: FontWeight.normal,
                                 ),
-                                onChanged: (value) {},
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isDisabled = PublicFunction.validate(
+                                        'age', value, _data);
+                                  });
+                                },
                               ),
                             ),
                             Container(
@@ -287,6 +310,8 @@ class _AddPatientState extends State<AddPatient> {
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     gender = newValue!.toString();
+                                    _isDisabled = PublicFunction.validate(
+                                        'gender', gender!, _data);
                                   });
                                 },
                                 items: genderData.map((item) {
@@ -325,7 +350,12 @@ class _AddPatientState extends State<AddPatient> {
                             color: Colors.black,
                             fontWeight: FontWeight.normal,
                           ),
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              _isDisabled = PublicFunction.validate(
+                                  'diagnosis', value, _data);
+                            });
+                          },
                         ),
                         Container(
                           height: 15,
@@ -346,6 +376,8 @@ class _AddPatientState extends State<AddPatient> {
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     roomNo = newValue!.toString();
+                                    _isDisabled = PublicFunction.validate(
+                                        'room_no', roomNo!, _data);
                                   });
                                 },
                                 items: roomData.map((item) {
@@ -381,6 +413,8 @@ class _AddPatientState extends State<AddPatient> {
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     wardNo = newValue!.toString();
+                                    _isDisabled = PublicFunction.validate(
+                                        'ward_no', wardNo!, _data);
                                   });
                                 },
                                 items: wardData.map((item) {
@@ -408,20 +442,23 @@ class _AddPatientState extends State<AddPatient> {
                     Container(
                       height: 10,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: PrimaryButton(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width,
-                        borderRadius: 15,
-                        text: 'Save',
-                        textColor: const Color(0xFFffffff),
-                        backgroundColor: Colors.green,
-                        isDisabled: false,
-                        onTap: () async {
-                          register();
-                        },
-                      ),
+                    PrimaryButton(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      borderRadius: 15,
+                      text: 'Save',
+                      textColor: const Color(0xFFffffff),
+                      backgroundColor: Colors.green,
+                      isDisabled: _isDisabled,
+                      onTap: () async {
+                        FocusManager.instance.primaryFocus!.unfocus();
+                        CustomDialog(
+                                title: 'Hang on',
+                                message:
+                                    'Are you sure you want to add this patient?',
+                                onTap: register)
+                            .defaultDialog();
+                      },
                     ),
                     Container(
                       height: 20,

@@ -1,7 +1,9 @@
 // ignore_for_file: file_names
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/messages.dart';
@@ -41,7 +43,7 @@ class _PatientListState extends State<PatientList> {
         };
         HttpRequest(parameters: {"sqlCode": "T1343", "parameters": parameters})
             .post()
-            .then((res) { 
+            .then((res) {
           if (res == null) {
             setState(() {
               isLoading = false;
@@ -87,27 +89,28 @@ class _PatientListState extends State<PatientList> {
           ),
         ),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF06919d),
+          backgroundColor: Colors.white,
+          leading: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: Icon(
+                Icons.clear,
+                color: Theme.of(context).primaryColor,
+                size: 30,
+              )),
+          title: Text(
+            'Patients',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: Colors.black, fontSize: 16),
+          ),
+          centerTitle: true,
           systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFF06919d),
-            statusBarIconBrightness: Brightness.light,
-          ),
-          elevation: 0,
-          leading: InkWell(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-          ),
-          title: const Text(
-            "Patients",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
+              statusBarIconBrightness: Brightness.dark,
+              statusBarColor: Colors.white),
+          elevation: 0.5,
         ),
         body: SafeArea(
           child: Container(
@@ -151,43 +154,41 @@ class _PatientListState extends State<PatientList> {
   }
 
   Widget patientsChuChu(data) {
-    return InkWell(
-      onTap: () {
-        //  print("data $data");
-        Navigator.push(
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: GestureDetector(
+        onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
             builder: ((context) => PatientDetails(dataObject: data)),
           ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
+        ),
         child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.grey.shade100,
-          ),
-          child: ListTile(
-            leading: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
+          color: Colors.white,
+          child: Column(
+            children: [
+              Container(
+                height: 10,
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey,
+              ListTile(
+                leading: const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage("assets/images/profileimage.png"),
                 ),
+                title: AutoSizeText(
+                  data["full_name"],
+                  style: const TextStyle(
+                    color: Color(0xFF255880),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: const Icon(Icons.keyboard_arrow_right),
               ),
-            ),
-            title: Text(data['full_name']),
-            subtitle: const Text("Patient Name"),
-            trailing: const Icon(
-              Icons.keyboard_arrow_right_rounded,
-              color: Colors.black,
-            ),
+              const Divider(),
+            ],
           ),
         ),
       ),

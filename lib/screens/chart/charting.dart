@@ -4,6 +4,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nurse_assistance/notification_service.dart';
 import 'package:nurse_assistance/screens/chart/add_chart.dart';
@@ -122,15 +123,15 @@ class _ChartState extends State<Chart> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: InkWell(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-        ),
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(
+              Icons.clear,
+              color: Theme.of(context).primaryColor,
+              size: 30,
+            )),
         title: Text(
           'Charts',
           style: Theme.of(context)
@@ -206,98 +207,92 @@ class _ChartState extends State<Chart> {
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AutoSizeText(
-                            widget.patientData["full_name"],
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500),
-                            maxLines: 2,
-                          ),
-                        ),
-                        Variable.horizontalSpace(10),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ViewChartOrderScreen(
-                                  patientId: widget.patientData["patient_id"],
-                                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.grey.shade300)),
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15)),
+                            border: Border.all(color: Colors.grey.shade300),
+                            color: Theme.of(context).primaryColor),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AutoSizeText(
+                                widget.patientData["full_name"],
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500),
+                                maxLines: 2,
                               ),
-                            );
-                          },
-                          child: Container(
-                            height: 40,
-                            width: 120,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Theme.of(context).primaryColor),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Center(
-                                child: Text(
-                              "Doctor's Order",
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: Theme.of(context).primaryColor),
-                            )),
-                          ),
-                        )
-                      ],
-                    ),
-                    const Divider(),
-                    Row(
-                      children: [
-                        const Text(
-                          "Room No: ",
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 15,
-                              fontWeight: FontWeight.normal),
-                          maxLines: 2,
+                            ),
+                            Variable.horizontalSpace(10),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewChartOrderScreen(
+                                      patientId:
+                                          widget.patientData["patient_id"],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 40,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: const Center(
+                                    child: Text(
+                                  "Doctor's Order",
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.white),
+                                )),
+                              ),
+                            )
+                          ],
                         ),
-                        Expanded(
-                          child: Text(
-                            '${widget.patientData["room_no"]}',
-                            style: const TextStyle(
-                                color: Colors.black87,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500),
-                            maxLines: 2,
-                          ),
-                        )
-                      ],
-                    ),
-                    Container(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        const Text(
-                          "Ward No: ",
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 15,
-                              fontWeight: FontWeight.normal),
-                          maxLines: 2,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Room No: ${widget.patientData["room_no"]}",
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal),
+                              maxLines: 2,
+                            ),
+                            Container(
+                              height: 10,
+                            ),
+                            Text(
+                              "Ward No: ${widget.patientData["ward_no"]}",
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal),
+                              maxLines: 2,
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: Text(
-                            '${widget.patientData["ward_no"]}',
-                            style: const TextStyle(
-                                color: Colors.black87,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500),
-                            maxLines: 2,
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
               const Divider(),
@@ -327,7 +322,10 @@ class _ChartState extends State<Chart> {
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return GestureDetector(
-                                      onTap: data[index]['is_done'] == 'Y'
+                                      onTap: data[index]['is_done'] == 'Y' ||
+                                              data[index]['nurse_id'] !=
+                                                  Variable
+                                                      .userInfo["personnel_id"]
                                           ? null
                                           : () {
                                               Navigator.of(context).push(
@@ -366,16 +364,23 @@ class _ChartState extends State<Chart> {
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
-                                                        Text(
-                                                          "Task No: ${index + 1}",
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
+                                                        Expanded(
+                                                          child: AutoSizeText(
+                                                            data[index]
+                                                                ['medic_name'],
+                                                            maxFontSize: 14,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 14),
+                                                          ),
                                                         ),
+                                                        Variable
+                                                            .horizontalSpace(
+                                                                10),
                                                         data[index]['is_done'] ==
                                                                 'Y'
                                                             ? const Icon(
@@ -401,20 +406,6 @@ class _ChartState extends State<Chart> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            data[index]
-                                                                ['medic_name'],
-                                                            style: const TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 14),
-                                                          ),
-                                                          Variable
-                                                              .verticalSpace(
-                                                                  10),
-                                                          Text(
                                                             'Date: ${DateFormat.yMMMMd('en_US').format(DateTime.parse(data[index]['medic_date']))}',
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -435,6 +426,16 @@ class _ChartState extends State<Chart> {
                                                               .verticalSpace(
                                                                   10),
                                                           Text(
+                                                            'Medication: ${data[index]['meal'] == 'N' ? 'N/A' : data[index]['meal']}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 13),
+                                                          ),
+                                                          Variable
+                                                              .verticalSpace(
+                                                                  10),
+                                                          Text(
                                                             'Status: ${data[index]['status'] == 'N' ? 'N/A' : data[index]['status']}',
                                                             style: const TextStyle(
                                                                 color: Colors
@@ -445,7 +446,7 @@ class _ChartState extends State<Chart> {
                                                               .verticalSpace(
                                                                   10),
                                                           Text(
-                                                            'Encoded By: ${data[index]['nurse_name']}',
+                                                            'Encoded By: ${data[index]['encoded_by_name'].isEmpty ? 'N/A' : data[index]['encoded_by_name']}',
                                                             style: const TextStyle(
                                                                 color: Colors
                                                                     .black,

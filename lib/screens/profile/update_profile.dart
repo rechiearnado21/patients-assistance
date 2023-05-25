@@ -183,7 +183,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       ),
                     ),
                     Container(
-                      height: 10,
+                      height: 20,
                     ),
                     TextField(
                       controller: email,
@@ -203,7 +203,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       ),
                     ),
                     Container(
-                      height: 10,
+                      height: 20,
                     ),
                     TextField(
                       controller: phone,
@@ -222,7 +222,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       ),
                     ),
                     Container(
-                      height: 10,
+                      height: 20,
                     ),
                     TextField(
                       controller: address,
@@ -243,26 +243,23 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     Container(
                       height: 20,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: PrimaryButton(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width,
-                        borderRadius: 15,
-                        text: 'Save',
-                        textColor: const Color(0xFFffffff),
-                        backgroundColor: Theme.of(context).primaryColor,
-                        isDisabled: false,
-                        onTap: () async {
-                          FocusManager.instance.primaryFocus!.unfocus();
-                          CustomDialog(
-                                  title: 'Hang on',
-                                  message:
-                                      'Are you sure you want to update this account?',
-                                  onTap: register)
-                              .defaultDialog();
-                        },
-                      ),
+                    PrimaryButton(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      borderRadius: 15,
+                      text: 'Save',
+                      textColor: const Color(0xFFffffff),
+                      backgroundColor: Theme.of(context).primaryColor,
+                      isDisabled: false,
+                      onTap: () async {
+                        FocusManager.instance.primaryFocus!.unfocus();
+                        CustomDialog(
+                                title: 'Hang on',
+                                message:
+                                    'Are you sure you want to update this account?',
+                                onTap: register)
+                            .defaultDialog();
+                      },
                     ),
                     Container(
                       height: 20,

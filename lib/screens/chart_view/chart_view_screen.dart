@@ -30,21 +30,26 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
     {"text": "Endosed", "value": "Endosed"},
     {"text": "Discontinued", "value": "Discontinued"},
   ];
+  List<dynamic> meal = [
+    {"text": "Before Meal", "value": "Before Meal"},
+    {"text": "After Meal", "value": "After Meal"},
+  ];
   String? statusVal;
+  String? mealVal;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: InkWell(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-        ),
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(
+              Icons.clear,
+              color: Theme.of(context).primaryColor,
+              size: 30,
+            )),
         title: Text(
           'Update Chart',
           style: Theme.of(context)
@@ -65,101 +70,93 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
             Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AutoSizeText(
-                          widget.patientData["patient_name"],
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
-                          maxLines: 2,
-                        ),
-                      ),
-                      Variable.horizontalSpace(10),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ViewChartOrderScreen(
-                                patientId: widget.patientData["patient_id"],
-                              ),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey.shade300)),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15)),
+                          border: Border.all(color: Colors.grey.shade300),
+                          color: Theme.of(context).primaryColor),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AutoSizeText(
+                              widget.patientData["patient_name"],
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500),
+                              maxLines: 2,
                             ),
-                          );
-                        },
-                        child: Container(
-                          height: 40,
-                          width: 120,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Theme.of(context).primaryColor),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: Center(
-                              child: Text(
-                            "Doctor's Order",
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: Theme.of(context).primaryColor),
-                          )),
-                        ),
-                      )
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    children: [
-                      const Text(
-                        "Room No: ",
-                        style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal),
-                        maxLines: 2,
+                          ),
+                          Variable.horizontalSpace(10),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ViewChartOrderScreen(
+                                    patientId: widget.patientData["patient_id"],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 40,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.white),
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: const Center(
+                                  child: Text(
+                                "Doctor's Order",
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.white),
+                              )),
+                            ),
+                          )
+                        ],
                       ),
-                      Expanded(
-                        child: Text(
-                          '${widget.patientData["room_no"]}',
-                          style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500),
-                          maxLines: 2,
-                        ),
-                      )
-                    ],
-                  ),
-                  Container(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      const Text(
-                        "Ward No: ",
-                        style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal),
-                        maxLines: 2,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Room No: ${widget.patientData["room_no"]}",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal),
+                            maxLines: 2,
+                          ),
+                          Container(
+                            height: 10,
+                          ),
+                          Text(
+                            "Ward No: ${widget.patientData["ward_no"]}",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal),
+                            maxLines: 2,
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Text(
-                          '${widget.patientData["ward_no"]}',
-                          style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500),
-                          maxLines: 2,
-                        ),
-                      )
-                    ],
-                  ),
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
-            const Divider(),
             Expanded(
                 child: StretchingOverscrollIndicator(
               axisDirection: AxisDirection.down,
@@ -217,6 +214,38 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                   DropdownButtonFormField(
                     style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
+                      hintText: "Select Medication",
+                      border: Variable.myinputborder(),
+                      enabledBorder: Variable.myinputborder(),
+                      focusedBorder: Variable.myfocusborder(),
+                    ),
+                    value: mealVal,
+                    onChanged: (newValue) {
+                      setState(() {
+                        mealVal = newValue!.toString();
+                        if (mealVal != null && statusVal != null) {
+                          _isDisabled = false;
+                        }
+                      });
+                    },
+                    items: meal.map((item) {
+                      return DropdownMenuItem(
+                          value: item['value'].toString(),
+                          child: AutoSizeText(
+                            item['text'],
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w200),
+                            overflow: TextOverflow.ellipsis,
+                            maxFontSize: 15,
+                            maxLines: 2,
+                          ));
+                    }).toList(),
+                  ),
+                  Variable.verticalSpace(20),
+                  DropdownButtonFormField(
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
                       hintText: "Select Status",
                       border: Variable.myinputborder(),
                       enabledBorder: Variable.myinputborder(),
@@ -226,7 +255,9 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                     onChanged: (newValue) {
                       setState(() {
                         statusVal = newValue!.toString();
-                        _isDisabled = false;
+                        if (statusVal != null && mealVal != null) {
+                          _isDisabled = false;
+                        }
                       });
                     },
                     items: statuses.map((item) {
@@ -278,8 +309,9 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
       if (hasInternet) {
         Map<String, dynamic> parameters = {
           "chart_id": widget.patientData["chart_id"],
-          "nurse_id": Variable.userInfo["personnel_id"],
+          "encoded_by": Variable.userInfo["personnel_id"],
           "status": statusVal!,
+          "meal": mealVal!,
           "is_done": 'Y',
         };
 

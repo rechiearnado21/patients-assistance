@@ -33,6 +33,7 @@ class PatientForm extends StatefulWidget {
 class _PatientFormState extends State<PatientForm> {
   TextEditingController nurseName = TextEditingController();
   bool isLoading = true;
+  bool isLoadingOrder = false;
   String? patientId;
   List<dynamic> nurseLocalData = [];
   List<dynamic> dropdownData = [];
@@ -98,7 +99,7 @@ class _PatientFormState extends State<PatientForm> {
     Variable.checkInternet((hasInternet) {
       if (!hasInternet) {
         setState(() {
-          isLoading = false;
+          isLoadingOrder = false;
         });
         CustomDialog(
                 message: Message.noInternet, isSuccess: false, isCancel: false)
@@ -113,7 +114,7 @@ class _PatientFormState extends State<PatientForm> {
             .then((res) {
           if (res == null) {
             setState(() {
-              isLoading = false;
+              isLoadingOrder = false;
             });
             CustomDialog(
                     message: Message.error, isSuccess: false, isCancel: false)
@@ -216,28 +217,27 @@ class _PatientFormState extends State<PatientForm> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
-          elevation: 0,
-          leading: InkWell(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: const Icon(
-              Icons.arrow_back,
-              color: Colors.black,
-            ),
+          leading: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: Icon(
+                Icons.clear,
+                color: Theme.of(context).primaryColor,
+                size: 30,
+              )),
+          title: Text(
+            'Assign Patient',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: Colors.black, fontSize: 16),
           ),
-          title: const AutoSizeText(
-            "Assign Patient",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          centerTitle: true,
           systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFF06919d),
-            statusBarIconBrightness: Brightness.light,
-          ),
+              statusBarIconBrightness: Brightness.dark,
+              statusBarColor: Colors.white),
+          elevation: 0.5,
         ),
         body: Container(
           height: MediaQuery.of(context).size.height,
@@ -343,23 +343,25 @@ class _PatientFormState extends State<PatientForm> {
                     Container(
                       height: 30,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: PrimaryButton(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width,
-                        borderRadius: 15,
-                        text: 'Submit',
-                        textColor: const Color(0xFFffffff),
-                        backgroundColor: Colors.green,
-                        isDisabled: patientId == null ? true : false,
-                        onTap: patientId == null
-                            ? () {}
-                            : () async {
-                                // register();
-                                submitAssignedPatient();
-                              },
-                      ),
+                    PrimaryButton(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      borderRadius: 15,
+                      text: 'Submit',
+                      textColor: const Color(0xFFffffff),
+                      backgroundColor: Colors.green,
+                      isDisabled: patientId == null ? true : false,
+                      onTap: patientId == null
+                          ? () {}
+                          : () async {
+                              FocusManager.instance.primaryFocus!.unfocus();
+                              CustomDialog(
+                                      title: 'Hang on',
+                                      message:
+                                          'Are you sure you want to assign this patient?',
+                                      onTap: submitAssignedPatient)
+                                  .defaultDialog();
+                            },
                     ),
                     Container(
                       height: 20,
