@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/screens/doctor_dashboard.dart/patientsList.dart';
 import 'package:nurse_assistance/screens/patient/view.dart';

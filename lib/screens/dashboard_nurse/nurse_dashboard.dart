@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,7 +55,6 @@ class _NurseDashboardState extends State<NurseDashboard> {
 
   @override
   void initState() {
-    notifyMePlease();
     getNotificationCount();
     getData();
     initPlatformState();
@@ -183,69 +181,69 @@ class _NurseDashboardState extends State<NurseDashboard> {
     });
   }
 
-  Future<void> notifyMePlease() async {
-    NotificationServices notificationServices = NotificationServices();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String personnelId = prefs.getString("PERSONNELID") ?? "0";
-    final String lastSyncDatetime = prefs.getString("LASTSYNCDATETIME") ??
-        DateTime.now().toString().split('.')[0];
+  // Future<void> notifyMePlease() async {
+  //   NotificationServices notificationServices = NotificationServices();
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final String personnelId = prefs.getString("PERSONNELID") ?? "0";
+  //   final String lastSyncDatetime = prefs.getString("LASTSYNCDATETIME") ??
+  //       DateTime.now().toString().split('.')[0];
 
-    notificationServices.initializeNotifications();
+  //   notificationServices.initializeNotifications();
 
-    if (int.parse(personnelId) == 0 || int.parse(personnelId) == 1) return;
+  //   if (int.parse(personnelId) == 0 || int.parse(personnelId) == 1) return;
 
-    Timer(const Duration(seconds: 5), () {
-      Variable.checkInternet((hasInternet) {
-        if (!hasInternet) {
-          notifyMePlease();
-        } else {
-          var parameters = <String, dynamic>{};
+  //   Timer(const Duration(seconds: 5), () {
+  //     Variable.checkInternet((hasInternet) {
+  //       if (!hasInternet) {
+  //         notifyMePlease();
+  //       } else {
+  //         var parameters = <String, dynamic>{};
 
-          parameters["in_dt"] = lastSyncDatetime;
-          parameters["nurse_id"] = int.parse(personnelId);
+  //         parameters["in_dt"] = lastSyncDatetime;
+  //         parameters["nurse_id"] = int.parse(personnelId);
 
-          HttpRequest(
-                  parameters: {"sqlCode": "T1353", "parameters": parameters})
-              .post()
-              .then((res) async {
-            if (res == null) {
-              notifyMePlease();
-            } else if (res["isSuccess"].toString() == "false") {
-              notifyMePlease();
-            } else {
-              if (res["rows"].isNotEmpty) {
-                prefs.setString("LASTSYNCDATETIME",
-                    DateTime.now().toString().split('.')[0]);
-                int ctr = 0;
-                for (var item in res["rows"]) {
-                  ctr++;
-                  await NotificationDatabase.instance
-                      .readNotificationById(item['chart_id'])
-                      .then((value) async {
-                    if (value != null) {
-                    } else {
-                      await NotificationDatabase.instance.insertUpdate(item);
+  //         HttpRequest(
+  //                 parameters: {"sqlCode": "T1353", "parameters": parameters})
+  //             .post()
+  //             .then((res) async {
+  //           if (res == null) {
+  //             notifyMePlease();
+  //           } else if (res["isSuccess"].toString() == "false") {
+  //             notifyMePlease();
+  //           } else {
+  //             if (res["rows"].isNotEmpty) {
+  //               prefs.setString("LASTSYNCDATETIME",
+  //                   DateTime.now().toString().split('.')[0]);
+  //               int ctr = 0;
+  //               for (var item in res["rows"]) {
+  //                 ctr++;
+  //                 await NotificationDatabase.instance
+  //                     .readNotificationById(item['chart_id'])
+  //                     .then((value) async {
+  //                   if (value != null) {
+  //                   } else {
+  //                     await NotificationDatabase.instance.insertUpdate(item);
 
-                      await AndroidAlarmManager.oneShotAt(
-                          DateTime.parse(item['medic_date']),
-                          item['chart_id'],
-                          oneShotAlarm);
-                    }
-                  });
+  //                     await AndroidAlarmManager.oneShotAt(
+  //                         DateTime.parse(item['medic_date']),
+  //                         item['chart_id'],
+  //                         oneShotAlarm);
+  //                   }
+  //                 });
 
-                  if ((ctr + 1) == res["rows"].length) {
-                    notifyMePlease();
-                  }
-                }
-              } else {
-                notifyMePlease();
-              }
-            }
-          });
-        }
-      });
-    });
-  }
+  //                 if ((ctr + 1) == res["rows"].length) {
+  //                   notifyMePlease();
+  //                 }
+  //               }
+  //             } else {
+  //               notifyMePlease();
+  //             }
+  //           }
+  //         });
+  //       }
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

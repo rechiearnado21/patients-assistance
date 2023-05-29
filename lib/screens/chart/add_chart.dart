@@ -203,18 +203,19 @@ class _AddChartState extends State<AddChart> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: PrimaryButton(
-                              height: 50,
-                              width: MediaQuery.of(context).size.width,
-                              borderRadius: 15,
-                              text: 'Save Chart',
-                              textColor: const Color(0xFFffffff),
-                              backgroundColor: Theme.of(context).primaryColor,
-                              isDisabled: false,
-                              onTap: () async {
-                                // register();
-                                submitAssignedPatient();
-                              },
-                            ),
+                                height: 50,
+                                width: MediaQuery.of(context).size.width,
+                                borderRadius: 15,
+                                text: 'Save',
+                                textColor: const Color(0xFFffffff),
+                                backgroundColor: Theme.of(context).primaryColor,
+                                isDisabled: false,
+                                onTap: () => CustomDialog(
+                                        title: 'Hang on',
+                                        message:
+                                            'Are you sure you want to save this chart?',
+                                        onTap: submitAssignedPatient)
+                                    .defaultDialog()),
                           ),
                           Container(
                             height: 20,
