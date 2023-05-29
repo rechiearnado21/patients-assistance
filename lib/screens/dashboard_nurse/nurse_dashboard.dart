@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +8,7 @@ import 'package:nurse_assistance/database/notifications_table.dart';
 import 'package:nurse_assistance/dialogs.dart';
 import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/messages.dart';
+import 'package:nurse_assistance/notification_service.dart';
 import 'package:nurse_assistance/notifications/notifications_screen.dart';
 import 'package:nurse_assistance/variables.dart';
 import 'package:page_transition/page_transition.dart';
@@ -15,6 +17,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../chart/charting.dart';
 import '../profile/update_profile.dart';
+
+@pragma('vm:entry-point')
+void oneShotAlarm() async {
+  NotificationServices notificationServices = NotificationServices();
+  await NotificationDatabase.instance
+      .readAllNotifications()
+      .then((value) async {
+    for (dynamic item in value) {
+      if (Variable.numSeconds(item["medic_date"]) <= 0 &&
+          Variable.numSeconds(item["medic_date"]) >= -30) {
+        notificationServices.sendNotification(
+            item["chart_id"], item["patient_name"], item["medic_name"]);
+
+        await Variable.flutterTts.speak(item["medic_name"]);
+        Timer(const Duration(seconds: 4), () async {
+          await Variable.flutterTts.speak(item["medic_name"]);
+        });
+      }
+    }
+  });
+}
 
 class NurseDashboard extends StatefulWidget {
   const NurseDashboard({super.key});
@@ -33,6 +56,7 @@ class _NurseDashboardState extends State<NurseDashboard> {
 
   @override
   void initState() {
+    notifyMePlease();
     getNotificationCount();
     getData();
     initPlatformState();
@@ -140,7 +164,7 @@ class _NurseDashboardState extends State<NurseDashboard> {
         getData();
       });
 
-  void getNotificationCount() async {
+  Future<void> getNotificationCount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setState(() {
@@ -155,6 +179,70 @@ class _NurseDashboardState extends State<NurseDashboard> {
           noNotification = value.length;
         });
         getNotificationCount();
+      });
+    });
+  }
+
+  Future<void> notifyMePlease() async {
+    NotificationServices notificationServices = NotificationServices();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String personnelId = prefs.getString("PERSONNELID") ?? "0";
+    final String lastSyncDatetime = prefs.getString("LASTSYNCDATETIME") ??
+        DateTime.now().toString().split('.')[0];
+
+    notificationServices.initializeNotifications();
+
+    if (int.parse(personnelId) == 0 || int.parse(personnelId) == 1) return;
+
+    Timer(const Duration(seconds: 5), () {
+      Variable.checkInternet((hasInternet) {
+        if (!hasInternet) {
+          notifyMePlease();
+        } else {
+          var parameters = <String, dynamic>{};
+
+          parameters["in_dt"] = lastSyncDatetime;
+          parameters["nurse_id"] = int.parse(personnelId);
+
+          HttpRequest(
+                  parameters: {"sqlCode": "T1353", "parameters": parameters})
+              .post()
+              .then((res) async {
+            if (res == null) {
+              notifyMePlease();
+            } else if (res["isSuccess"].toString() == "false") {
+              notifyMePlease();
+            } else {
+              if (res["rows"].isNotEmpty) {
+                prefs.setString("LASTSYNCDATETIME",
+                    DateTime.now().toString().split('.')[0]);
+                int ctr = 0;
+                for (var item in res["rows"]) {
+                  ctr++;
+                  await NotificationDatabase.instance
+                      .readNotificationById(item['chart_id'])
+                      .then((value) async {
+                    if (value != null) {
+                    } else {
+                      await NotificationDatabase.instance.insertUpdate(item);
+
+                      await AndroidAlarmManager.oneShotAt(
+                          DateTime.parse(item['medic_date']),
+                          item['chart_id'],
+                          oneShotAlarm);
+                    }
+                  });
+
+                  if ((ctr + 1) == res["rows"].length) {
+                    notifyMePlease();
+                  }
+                }
+              } else {
+                notifyMePlease();
+              }
+            }
+          });
+        }
       });
     });
   }
@@ -897,10 +985,20 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: GestureDetector(
-        onTap: () => CustomDialog(
-            title: 'Hang on',
-            message: 'Are you sure you want to recommend this patient?',
-            onTap: () => submitAssignedPatient(dataNurse)).defaultDialog(),
+        onTap: () {
+          if (dataNurse["shift"] == 'N') {
+            const CustomDialog(
+              title: 'Oopss',
+              isCancel: false,
+              message: 'This nurse is currently not available.',
+            ).defaultDialog();
+          } else {
+            CustomDialog(
+                title: 'Hang on',
+                message: 'Are you sure you want to recommend this patient?',
+                onTap: () => submitAssignedPatient(dataNurse)).defaultDialog();
+          }
+        },
         child: Container(
           color: Colors.white,
           child: Column(
@@ -922,6 +1020,30 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Row(
+                  children: [
+                    Icon(
+                      dataNurse["shift"] == 'N'
+                          ? Icons.clear
+                          : Icons.check_circle_outline,
+                      color:
+                          dataNurse["shift"] == 'N' ? Colors.red : Colors.green,
+                      size: 15,
+                    ),
+                    Variable.horizontalSpace(5),
+                    AutoSizeText(
+                      dataNurse["shift"] == 'N'
+                          ? 'Not Available'
+                          : '${dataNurse["shift"]} Shift',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
                 trailing: const Icon(Icons.keyboard_arrow_right),
               ),

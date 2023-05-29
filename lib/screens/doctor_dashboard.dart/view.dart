@@ -431,7 +431,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             height: 10,
                           ),
                           Text(
-                            myDept(data["department_id"]),
+                            'Nurse/${myDept(data["department_id"])}',
                             style: const TextStyle(
                               color: Color(0xFF255880),
                               fontWeight: FontWeight.normal,
@@ -442,20 +442,27 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             height: 10,
                           ),
                           Row(
-                            children: const [
+                            children: [
                               Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.green,
+                                data["shift"] == 'N'
+                                    ? Icons.clear
+                                    : Icons.check_circle_outline,
+                                color: data["shift"] == 'N'
+                                    ? Colors.red
+                                    : Colors.green,
                                 size: 15,
                               ),
-                              Text(
-                                " Available",
+                              Variable.horizontalSpace(5),
+                              AutoSizeText(
+                                data["shift"] == 'N'
+                                    ? 'Not Available'
+                                    : '${data["shift"]} Shift',
                                 style: TextStyle(
-                                  color: Colors.black54,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                  letterSpacing: 1,
+                                  color: Colors.grey.shade600,
+                                  fontSize: 11,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -474,15 +481,22 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 15),
                                 onPressed: () async {
-                                  //  Get.toNamed(AppRoutes.patient);
-                                  //print("data $data");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: ((context) =>
-                                          PatientScreen(nurseData: data)),
-                                    ),
-                                  );
+                                  if (data["shift"] == 'N') {
+                                    const CustomDialog(
+                                      title: 'Oopss',
+                                      isCancel: false,
+                                      message:
+                                          'This nurse is currently not available.',
+                                    ).defaultDialog();
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: ((context) =>
+                                            PatientScreen(nurseData: data)),
+                                      ),
+                                    );
+                                  }
                                 },
                                 child: const Center(
                                   child: Text(

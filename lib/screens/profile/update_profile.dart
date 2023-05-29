@@ -24,6 +24,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController email = TextEditingController();
   final TextEditingController phone = TextEditingController();
   final TextEditingController address = TextEditingController();
+  String? shift;
 
   List<dynamic> dept = [
     {"dept": "Gastroentrology", "value": 1},
@@ -37,6 +38,12 @@ class _UpdateProfileState extends State<UpdateProfile> {
     {"type": "Nurse", "value": 2}
   ];
 
+  List<dynamic> shiftDd = [
+    {"text": "Morning Shift", "value": "Morning"},
+    {"text": "Evening Shift", "value": "Evening"},
+    {"text": "Midnight Shift", "value": "Midnight"},
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +51,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
     email.text = Variable.userInfo["email"];
     phone.text = Variable.userInfo["mobile_no"];
     address.text = Variable.userInfo["address"];
+    shift =
+        Variable.userInfo["shift"] == 'N' ? null : Variable.userInfo["shift"];
   }
 
   String myDept(id) {
@@ -77,7 +86,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
           title: Text(
-            'Update Information',
+            'Profile Details',
             style: Theme.of(context)
                 .textTheme
                 .bodySmall!
@@ -243,11 +252,43 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     Container(
                       height: 20,
                     ),
+                    if (Variable.userInfo["role_id"] != 1)
+                      DropdownButtonFormField(
+                        style: const TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                          hintText: "Select Shift",
+                          border: Variable.myinputborder(),
+                          enabledBorder: Variable.myinputborder(),
+                          focusedBorder: Variable.myfocusborder(),
+                        ),
+                        value: shift,
+                        onChanged: (newValue) {
+                          setState(() {
+                            shift = newValue!.toString();
+                          });
+                        },
+                        items: shiftDd.map((item) {
+                          return DropdownMenuItem(
+                              value: item['value'].toString(),
+                              child: AutoSizeText(
+                                item['text'],
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxFontSize: 15,
+                                maxLines: 2,
+                              ));
+                        }).toList(),
+                      ),
+                    Container(
+                      height: 20,
+                    ),
                     PrimaryButton(
                       height: 50,
                       width: MediaQuery.of(context).size.width,
                       borderRadius: 15,
-                      text: 'Save',
+                      text: 'Update',
                       textColor: const Color(0xFFffffff),
                       backgroundColor: Theme.of(context).primaryColor,
                       isDisabled: false,
@@ -256,7 +297,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         CustomDialog(
                                 title: 'Hang on',
                                 message:
-                                    'Are you sure you want to update this account?',
+                                    'Are you sure you want to update this profile?',
                                 onTap: register)
                             .defaultDialog();
                       },
@@ -305,6 +346,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
           "mobile_no": phone.text,
           "address": address.text,
           "gender": "M",
+          "shift": shift ?? 'N'
         };
 
         HttpRequest(parameters: {"sqlCode": "T1340", "parameters": parameters})
@@ -318,12 +360,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
           } else if (res["rows"].isNotEmpty) {
             Get.back();
             if (res["rows"][0]["success"] == "Y") {
-              setState(() {
-                Variable.userInfo["full_name"] == fullName.text;
-                Variable.userInfo["mobile_no"] == phone.text;
-                Variable.userInfo["address"] == address.text;
-                Variable.userInfo["gender"] == "M";
-              });
+              Variable.userInfo["full_name"] = fullName.text;
+              Variable.userInfo["mobile_no"] = phone.text;
+              Variable.userInfo["address"] = address.text;
+              Variable.userInfo["gender"] = "M";
+              Variable.userInfo["shift"] = shift ?? 'N';
               CustomDialog(
                   title: "Success",
                   message: res["rows"][0]["msg"],

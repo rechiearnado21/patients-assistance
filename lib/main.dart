@@ -28,9 +28,6 @@ void oneShotAlarm() async {
         await Variable.flutterTts.speak(item["medic_name"]);
         Timer(const Duration(seconds: 4), () async {
           await Variable.flutterTts.speak(item["medic_name"]);
-          // Timer(const Duration(seconds: 4), () async {
-          //   await Variable.flutterTts.speak(item["medic_name"]);
-          // });
         });
       }
     }
@@ -134,7 +131,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Mobile Assistance App for Nurses',
       theme: ThemeData(
           primarySwatch: Colors.blue,
-          primaryColor: Colors.green,
+          primaryColor: const Color(0xFF06919d),
           primaryColorLight: const Color(0xFF4466a0),
           scaffoldBackgroundColor: Colors.white,
           bottomSheetTheme:

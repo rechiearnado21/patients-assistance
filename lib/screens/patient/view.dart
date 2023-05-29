@@ -282,7 +282,7 @@ class _PatientFormState extends State<PatientForm> {
                             Container(
                               height: 15,
                             ),
-                            const Text("Patient Name"),
+                            const Text("Patient"),
                             Container(
                               height: 10,
                             ),
@@ -320,7 +320,7 @@ class _PatientFormState extends State<PatientForm> {
                       height: 20,
                     ),
                     const Text(
-                      "Doctors Order",
+                      "Doctor's Order",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
