@@ -448,7 +448,7 @@ class _AddPatientState extends State<AddPatient> {
                       borderRadius: 15,
                       text: 'Save',
                       textColor: const Color(0xFFffffff),
-                      backgroundColor: Colors.green,
+                      backgroundColor: Theme.of(context).primaryColor,
                       isDisabled: _isDisabled,
                       onTap: () async {
                         FocusManager.instance.primaryFocus!.unfocus();

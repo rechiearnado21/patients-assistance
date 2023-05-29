@@ -132,7 +132,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: const Color(0xFF06919d),
-          primaryColorLight: const Color(0xFF4466a0),
+          primaryColorLight: const Color.fromARGB(255, 74, 146, 153),
           scaffoldBackgroundColor: Colors.white,
           bottomSheetTheme:
               const BottomSheetThemeData(backgroundColor: Colors.white),

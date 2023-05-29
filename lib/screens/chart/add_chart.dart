@@ -208,7 +208,7 @@ class _AddChartState extends State<AddChart> {
                               borderRadius: 15,
                               text: 'Save Chart',
                               textColor: const Color(0xFFffffff),
-                              backgroundColor: Colors.green,
+                              backgroundColor: Theme.of(context).primaryColor,
                               isDisabled: false,
                               onTap: () async {
                                 // register();

@@ -477,7 +477,7 @@ class _NurseDashboardState extends State<NurseDashboard> {
                           color: Color.fromARGB(255, 7, 182, 235),
                         ),
                         Text(
-                          " List of patients",
+                          " List of Patients",
                           style: TextStyle(
                             color: Colors.black54,
                             fontWeight: FontWeight.w500,

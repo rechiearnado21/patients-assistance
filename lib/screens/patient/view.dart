@@ -349,7 +349,7 @@ class _PatientFormState extends State<PatientForm> {
                       borderRadius: 15,
                       text: 'Submit',
                       textColor: const Color(0xFFffffff),
-                      backgroundColor: Colors.green,
+                      backgroundColor: Theme.of(context).primaryColor,
                       isDisabled: patientId == null ? true : false,
                       onTap: patientId == null
                           ? () {}

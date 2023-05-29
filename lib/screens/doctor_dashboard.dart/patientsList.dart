@@ -84,7 +84,7 @@ class _PatientListState extends State<PatientList> {
                 ),
               );
             },
-            backgroundColor: Colors.green,
+            backgroundColor: Theme.of(context).primaryColor,
             child: const Icon(Icons.add),
           ),
         ),

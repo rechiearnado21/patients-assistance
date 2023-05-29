@@ -147,7 +147,7 @@ class _PatientDetailsState extends State<PatientDetails>
                       ),
                     );
                   },
-                  backgroundColor: Colors.green,
+                  backgroundColor: Theme.of(context).primaryColor,
                   child: const Icon(Icons.add),
                 ),
               ),

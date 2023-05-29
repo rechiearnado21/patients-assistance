@@ -232,16 +232,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 ),
                               );
                             },
-                            child: const Card(
+                            child: Card(
                               color: Colors.white,
-                              shape: RoundedRectangleBorder(
+                              shape: const RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(80))),
                               child: Padding(
-                                padding: EdgeInsets.all(5.0),
+                                padding: const EdgeInsets.all(5.0),
                                 child: Icon(
                                   Icons.people,
-                                  color: Colors.purple,
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               ),
                             ),
@@ -312,17 +312,18 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   child: Column(
                     children: [
                       Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today,
+                        children: const [
+                          Icon(
+                            Icons.list,
                             color: Color.fromARGB(255, 7, 182, 235),
                           ),
                           Text(
-                            ' ${DateFormat.yMMMd().format(DateTime.now())}',
-                            style: const TextStyle(
-                              color: Colors.black87,
+                            " List of Nurses",
+                            style: TextStyle(
+                              color: Colors.black54,
                               fontWeight: FontWeight.w500,
                               fontSize: 15,
+                              letterSpacing: 1,
                             ),
                           ),
                         ],
@@ -477,7 +478,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
-                                color: Colors.green,
+                                color: Theme.of(context).primaryColorLight,
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 15),
                                 onPressed: () async {
