@@ -1,8 +1,11 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:nurse_assistance/database/notifications_table.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../dialogs.dart';
@@ -11,6 +14,12 @@ import '../../messages.dart';
 import '../../routes/routes.dart';
 import '../../variables.dart';
 import '../../widgets/widgets.dart';
+
+enum AppState {
+  free,
+  picked,
+  cropped,
+}
 
 class UpdateProfile extends StatefulWidget {
   const UpdateProfile({super.key});
@@ -25,7 +34,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final TextEditingController phone = TextEditingController();
   final TextEditingController address = TextEditingController();
   String? shift;
+  bool isLoading = true;
 
+  final ImagePicker _picker = ImagePicker();
+  String? imageBase64;
+  File? imageFile;
+  AppState? state;
+  String? imageFileBase64;
   List<dynamic> dept = [
     {"dept": "Gastroentrology", "value": 1},
     {"dept": "Gynaecology", "value": 2},
@@ -53,6 +68,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     address.text = Variable.userInfo["address"];
     shift =
         Variable.userInfo["shift"] == 'N' ? null : Variable.userInfo["shift"];
+    isLoading = false;
   }
 
   String myDept(id) {
@@ -143,10 +159,57 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.purple,
-                      radius: 50,
-                      backgroundImage: AssetImage("assets/images/doctora.png"),
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.purple,
+                          radius: 50,
+                          backgroundImage: imageFile == null &&
+                                  Variable.userInfo["image_file"] == ""
+                              ? const AssetImage('assets/images/doctora.png')
+                              : imageFile != null
+                                  ? FileImage(imageFile!)
+                                  : MemoryImage(
+                                      const Base64Decoder().convert(
+                                          Variable.userInfo["image_file"]),
+                                    ) as ImageProvider,
+                        ),
+                        // Container(
+                        //   width: 50,
+                        //   height: 50,
+                        //   decoration: BoxDecoration(
+                        //       shape: BoxShape.circle,
+                        //       image: DecorationImage(
+                        //           image: !isLoading
+                        //               ? MemoryImage(
+                        //                   const Base64Decoder().convert(
+                        //                       Variable.userInfo["image_file"]),
+                        //                 )
+                        //               : const AssetImage(
+                        //                       "assets/images/profIcon.png")
+                        //                   as ImageProvider,
+                        //           fit: BoxFit.cover)),
+                        // ),
+                        Positioned(
+                          bottom: 10,
+                          right: 0,
+                          child: InkWell(
+                            onTap: () {
+                              takePhoto(ImageSource.camera);
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              child: const Icon(
+                                Icons.camera,
+                                color: Colors.purple,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     Container(
                       height: 10,
@@ -335,6 +398,31 @@ class _UpdateProfileState extends State<UpdateProfile> {
     );
   }
 
+  void takePhoto(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(
+      source: source,
+      imageQuality: 25,
+      maxHeight: 480,
+      maxWidth: 640,
+    );
+
+    setState(() {
+      imageFile = pickedFile != null ? File(pickedFile.path) : null;
+    });
+    if (imageFile != null) {
+      setState(() {
+        state = AppState.picked;
+        imageFile!.readAsBytes().then((data) {
+          imageBase64 = base64.encode(data);
+
+          imageFileBase64 = imageBase64.toString();
+        });
+      });
+    } else {
+      imageBase64 = null;
+    }
+  }
+
   Future<void> register() async {
     const CustomDialog(isCancel: false).loadingDialog();
 
@@ -346,7 +434,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
           "mobile_no": phone.text,
           "address": address.text,
           "gender": "M",
-          "shift": shift ?? 'N'
+          "shift": shift ?? 'N',
+          "image_file": imageFileBase64
         };
 
         HttpRequest(parameters: {"sqlCode": "T1340", "parameters": parameters})
@@ -365,6 +454,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
               Variable.userInfo["address"] = address.text;
               Variable.userInfo["gender"] = "M";
               Variable.userInfo["shift"] = shift ?? 'N';
+              Variable.userInfo["image_file"] = imageFileBase64;
+
               CustomDialog(
                   title: "Success",
                   message: res["rows"][0]["msg"],

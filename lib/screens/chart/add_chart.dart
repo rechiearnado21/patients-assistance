@@ -149,13 +149,6 @@ class _AddChartState extends State<AddChart> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Task 1",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          ),
                           Container(
                             height: 20,
                           ),

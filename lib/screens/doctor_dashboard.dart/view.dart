@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,7 +69,6 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           } else {
             setState(() {
               data = res["rows"];
-              //data["full_name"]
 
               isLoading = false;
             });
@@ -176,16 +177,19 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                       ),
                                     );
                                   },
-                                  child: Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage(
-                                              "assets/images/doctora.png"),
-                                        )),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.purple,
+                                    radius: 30,
+                                    backgroundImage: Variable
+                                                .userInfo["image_file"] ==
+                                            ""
+                                        ? const AssetImage(
+                                            'assets/images/doctora.png')
+                                        : MemoryImage(
+                                            const Base64Decoder().convert(
+                                                Variable
+                                                    .userInfo["image_file"]),
+                                          ) as ImageProvider,
                                   ),
                                 ),
                                 Container(
@@ -376,7 +380,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     );
   }
 
-  Widget lamingaNurse(dynamic data) {
+  Widget lamingaNurse(dynamic datas) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
@@ -392,15 +396,15 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     children: [
                       Column(
                         children: [
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/images/profileimage.png"),
-                                )),
+                          CircleAvatar(
+                            backgroundColor: Colors.purple,
+                            radius: 30,
+                            backgroundImage: datas["image_file"].isEmpty
+                                ? const AssetImage('assets/images/doctora.png')
+                                : MemoryImage(
+                                    const Base64Decoder()
+                                        .convert(datas["image_file"]),
+                                  ) as ImageProvider,
                           ),
                           Container(
                             height: 40,
@@ -418,7 +422,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             height: 10,
                           ),
                           AutoSizeText(
-                            data["full_name"],
+                            datas["full_name"],
                             style: const TextStyle(
                               color: Color(0xFF255880),
                               fontWeight: FontWeight.w500,
@@ -431,7 +435,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             height: 10,
                           ),
                           Text(
-                            'Nurse/${myDept(data["department_id"])}',
+                            'Nurse/${myDept(datas["department_id"])}',
                             style: const TextStyle(
                               color: Color(0xFF255880),
                               fontWeight: FontWeight.normal,
@@ -444,19 +448,19 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           Row(
                             children: [
                               Icon(
-                                data["shift"] == 'N'
+                                datas["shift"] == 'N'
                                     ? Icons.clear
                                     : Icons.check_circle_outline,
-                                color: data["shift"] == 'N'
+                                color: datas["shift"] == 'N'
                                     ? Colors.red
                                     : Colors.green,
                                 size: 15,
                               ),
                               Variable.horizontalSpace(5),
                               AutoSizeText(
-                                data["shift"] == 'N'
+                                datas["shift"] == 'N'
                                     ? 'Not Available'
-                                    : '${data["shift"]} Shift',
+                                    : '${datas["shift"]} Shift',
                                 style: TextStyle(
                                   color: Colors.grey.shade600,
                                   fontSize: 11,
@@ -481,7 +485,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 15),
                                 onPressed: () async {
-                                  if (data["shift"] == 'N') {
+                                  if (datas["shift"] == 'N') {
                                     const CustomDialog(
                                       title: 'Oopss',
                                       isCancel: false,
@@ -493,7 +497,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                       context,
                                       MaterialPageRoute(
                                         builder: ((context) =>
-                                            PatientScreen(nurseData: data)),
+                                            PatientScreen(nurseData: datas)),
                                       ),
                                     );
                                   }

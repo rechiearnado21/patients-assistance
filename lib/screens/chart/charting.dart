@@ -295,7 +295,18 @@ class _ChartState extends State<Chart> {
                   ),
                 ),
               ),
-              const Divider(),
+
+              const Padding(
+                padding: EdgeInsets.only(left: 20.0, top: 5.0, bottom: 10),
+                child: AutoSizeText(
+                  "List of Charts",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500),
+                  maxLines: 2,
+                ),
+              ),
               Expanded(
                   child: Container(
                 child: isLoading

@@ -93,6 +93,9 @@ class _AddPatientState extends State<AddPatient> {
       setState(() {
         dateTime = datePicker;
         patientBirthDate.text = parsedDate(dateTime.toString());
+
+        _isDisabled =
+            PublicFunction.validate('birth_date', patientBirthDate.text, _data);
       });
     }
   }

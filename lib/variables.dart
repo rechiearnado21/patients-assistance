@@ -18,6 +18,46 @@ class Variable {
         : index - 1;
   }
 
+  void zettaGroupBy(data, callBack) {
+    var groups = [];
+    // ignore: no_leading_underscores_for_local_identifiers
+    _setItem(name, value) {
+      // ignore: prefer_typing_uninitialized_variables
+      var r;
+      r = null;
+      for (var itemData in groups) {
+        if (itemData['patient_name'] == name) {
+          r = itemData;
+        }
+      }
+      if (r != null) {
+        r['items'].add(value);
+      } else {
+        var item = {
+          "patient_name": name,
+          "items": [value]
+        };
+
+        groups.add(item);
+      }
+    }
+
+    for (var itemData in data) {
+      var self = itemData;
+      var group = "";
+      group = '${self["patient_name"]}';
+
+      // for (String colName in colNames) {
+      //   if (_group != "") _group += "_";
+      //   _group += _self.tripNo.toString();
+      // }
+
+      _setItem(group, itemData);
+    }
+
+    callBack(groups);
+  }
+
   static Widget textFieldTitle(BuildContext context, String title) => Text(
         title,
         textAlign: TextAlign.left,

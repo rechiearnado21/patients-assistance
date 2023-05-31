@@ -214,7 +214,7 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                   DropdownButtonFormField(
                     style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      hintText: "Select Medication",
+                      hintText: "Food",
                       border: Variable.myinputborder(),
                       enabledBorder: Variable.myinputborder(),
                       focusedBorder: Variable.myfocusborder(),
@@ -234,8 +234,8 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                           child: AutoSizeText(
                             item['text'],
                             style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w200),
+                              color: Colors.black,
+                            ),
                             overflow: TextOverflow.ellipsis,
                             maxFontSize: 15,
                             maxLines: 2,
@@ -246,7 +246,7 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                   DropdownButtonFormField(
                     style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      hintText: "Select Status",
+                      hintText: "Status",
                       border: Variable.myinputborder(),
                       enabledBorder: Variable.myinputborder(),
                       focusedBorder: Variable.myfocusborder(),
@@ -266,8 +266,8 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                           child: AutoSizeText(
                             item['text'],
                             style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w200),
+                              color: Colors.black,
+                            ),
                             overflow: TextOverflow.ellipsis,
                             maxFontSize: 15,
                             maxLines: 2,

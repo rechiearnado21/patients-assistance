@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:nurse_assistance/http_request.dart';
 import 'package:nurse_assistance/messages.dart';
 import 'package:nurse_assistance/notification_service.dart';
 import 'package:nurse_assistance/notifications/notifications_screen.dart';
+import 'package:nurse_assistance/screens/my_record/my_records.dart';
 import 'package:nurse_assistance/variables.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -295,17 +297,30 @@ class _NurseDashboardState extends State<NurseDashboard> {
                                   ),
                                 );
                               },
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                          "assets/images/doctora.png"),
-                                    )),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.purple,
+                                radius: 30,
+                                backgroundImage: Variable
+                                            .userInfo["image_file"] ==
+                                        ""
+                                    ? const AssetImage(
+                                        'assets/images/doctora.png')
+                                    : MemoryImage(
+                                        const Base64Decoder().convert(
+                                            Variable.userInfo["image_file"]),
+                                      ) as ImageProvider,
                               ),
+                              // Container(
+                              //   width: 50,
+                              //   height: 50,
+                              //   decoration: const BoxDecoration(
+                              //       shape: BoxShape.circle,
+                              //       image: DecorationImage(
+                              //         fit: BoxFit.cover,
+                              //         image: AssetImage(
+                              //             "assets/images/doctora.png"),
+                              //       )),
+                              // ),
                             ),
                             Container(
                               width: 10,
@@ -465,8 +480,9 @@ class _NurseDashboardState extends State<NurseDashboard> {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                child: Column(
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: const [
@@ -484,6 +500,45 @@ class _NurseDashboardState extends State<NurseDashboard> {
                           ),
                         ),
                       ],
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: ((context) => const MyRecords()),
+                          ),
+                        );
+                      },
+                      padding: const EdgeInsets.only(right: 0),
+                      child: Card(
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.pie_chart_rounded,
+                                color: Colors.purple,
+                              ),
+                              Text(
+                                "Records",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -875,6 +930,30 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                     filter = value;
                   });
                 }),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: Column(
+              children: [
+                Row(
+                  children: const [
+                    Icon(
+                      Icons.list,
+                      color: Color.fromARGB(255, 7, 182, 235),
+                    ),
+                    Text(
+                      " List of Nurses",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           const Divider(),
           Expanded(
