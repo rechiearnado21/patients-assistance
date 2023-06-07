@@ -24,7 +24,6 @@ class PublicFunction {
             element["is_required"] == true && element["value"].isNotEmpty)
         .toList()
         .length;
-
     if (numDataIsRequired == numDataWasValidated) {
       res = false;
     } else {

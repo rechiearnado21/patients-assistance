@@ -150,6 +150,17 @@ class _ChartViewScreenState extends State<ChartViewScreen> {
                                 fontWeight: FontWeight.normal),
                             maxLines: 2,
                           ),
+                          Container(
+                            height: 10,
+                          ),
+                          Text(
+                            "Diagnosis: ${widget.patientData["diagnosis"]}",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal),
+                            maxLines: 2,
+                          ),
                         ],
                       ),
                     )

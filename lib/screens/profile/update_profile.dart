@@ -454,7 +454,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
               Variable.userInfo["address"] = address.text;
               Variable.userInfo["gender"] = "M";
               Variable.userInfo["shift"] = shift ?? 'N';
-              Variable.userInfo["image_file"] = imageFileBase64;
+              Variable.userInfo["image_file"] =
+                  imageFileBase64 ?? Variable.userInfo["image_file"];
 
               CustomDialog(
                   title: "Success",

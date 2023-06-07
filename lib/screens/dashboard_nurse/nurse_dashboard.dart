@@ -183,70 +183,6 @@ class _NurseDashboardState extends State<NurseDashboard> {
     });
   }
 
-  // Future<void> notifyMePlease() async {
-  //   NotificationServices notificationServices = NotificationServices();
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final String personnelId = prefs.getString("PERSONNELID") ?? "0";
-  //   final String lastSyncDatetime = prefs.getString("LASTSYNCDATETIME") ??
-  //       DateTime.now().toString().split('.')[0];
-
-  //   notificationServices.initializeNotifications();
-
-  //   if (int.parse(personnelId) == 0 || int.parse(personnelId) == 1) return;
-
-  //   Timer(const Duration(seconds: 5), () {
-  //     Variable.checkInternet((hasInternet) {
-  //       if (!hasInternet) {
-  //         notifyMePlease();
-  //       } else {
-  //         var parameters = <String, dynamic>{};
-
-  //         parameters["in_dt"] = lastSyncDatetime;
-  //         parameters["nurse_id"] = int.parse(personnelId);
-
-  //         HttpRequest(
-  //                 parameters: {"sqlCode": "T1353", "parameters": parameters})
-  //             .post()
-  //             .then((res) async {
-  //           if (res == null) {
-  //             notifyMePlease();
-  //           } else if (res["isSuccess"].toString() == "false") {
-  //             notifyMePlease();
-  //           } else {
-  //             if (res["rows"].isNotEmpty) {
-  //               prefs.setString("LASTSYNCDATETIME",
-  //                   DateTime.now().toString().split('.')[0]);
-  //               int ctr = 0;
-  //               for (var item in res["rows"]) {
-  //                 ctr++;
-  //                 await NotificationDatabase.instance
-  //                     .readNotificationById(item['chart_id'])
-  //                     .then((value) async {
-  //                   if (value != null) {
-  //                   } else {
-  //                     await NotificationDatabase.instance.insertUpdate(item);
-
-  //                     await AndroidAlarmManager.oneShotAt(
-  //                         DateTime.parse(item['medic_date']),
-  //                         item['chart_id'],
-  //                         oneShotAlarm);
-  //                   }
-  //                 });
-
-  //                 if ((ctr + 1) == res["rows"].length) {
-  //                   notifyMePlease();
-  //                 }
-  //               }
-  //             } else {
-  //               notifyMePlease();
-  //             }
-  //           }
-  //         });
-  //       }
-  //     });
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -621,70 +557,86 @@ class _NurseDashboardState extends State<NurseDashboard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/images/profileimage.png"),
-                                  )),
-                            ),
-                            Container(
-                              height: 40,
-                            )
-                          ],
-                        ),
-                        Container(
-                          width: 15,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            AutoSizeText(
-                              data["full_name"],
-                              style: const TextStyle(
-                                color: Color(0xFF255880),
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/profileimage.png"),
+                                    )),
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              Container(
+                                height: 40,
+                              )
+                            ],
+                          ),
+                          Container(
+                            width: 15,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AutoSizeText(
+                                  data["full_name"],
+                                  style: const TextStyle(
+                                    color: Color(0xFF255880),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Container(
+                                  height: 5,
+                                ),
+                                Text(
+                                  "Room No: ${data["room_no"]}",
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Container(
+                                  height: 5,
+                                ),
+                                Text(
+                                  "Ward No: ${data["ward_no"]}",
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Container(
+                                  height: 5,
+                                ),
+                                Text(
+                                  "Diagnosis: ${data["diagnosis"]}",
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 2,
+                                ),
+                              ],
                             ),
-                            Container(
-                              height: 5,
-                            ),
-                            Text(
-                              "Room No: ${data["room_no"]}",
-                              style: const TextStyle(
-                                color: Colors.black54,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 12,
-                              ),
-                            ),
-                            Container(
-                              height: 5,
-                            ),
-                            Text(
-                              "Ward No: ${data["ward_no"]}",
-                              style: const TextStyle(
-                                color: Colors.black54,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 12,
-                              ),
-                            ),
-                            Container(
-                              height: 5,
-                            ),
-                          ],
-                        )
-                      ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 5,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -881,6 +833,17 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                         ),
                         Text(
                           "Ward No: ${widget.data["ward_no"]}",
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal),
+                          maxLines: 2,
+                        ),
+                        Container(
+                          height: 10,
+                        ),
+                        Text(
+                          "Diagnosis: ${widget.data["diagnosis"]}",
                           style: const TextStyle(
                               color: Colors.black,
                               fontSize: 14,
@@ -1084,9 +1047,15 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                 height: 10,
               ),
               ListTile(
-                leading: const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage("assets/images/profileimage.png"),
+                leading: CircleAvatar(
+                  backgroundColor: Colors.purple,
+                  radius: 30,
+                  backgroundImage: dataNurse["image_file"].isEmpty
+                      ? const AssetImage('assets/images/doctora.png')
+                      : MemoryImage(
+                          const Base64Decoder()
+                              .convert(dataNurse["image_file"]),
+                        ) as ImageProvider,
                 ),
                 title: AutoSizeText(
                   dataNurse["full_name"],

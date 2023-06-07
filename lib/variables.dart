@@ -18,6 +18,14 @@ class Variable {
         : index - 1;
   }
 
+  List<dynamic> deptData = [
+    {"dept": "Gastroentrology", "value": 1},
+    {"dept": "Gynaecology", "value": 2},
+    {"dept": "Cardiology", "value": 3},
+    {"dept": "Neurology", "value": 4},
+    {"dept": "Pediatrics", "value": 5},
+  ];
+
   void zettaGroupBy(data, callBack) {
     var groups = [];
     // ignore: no_leading_underscores_for_local_identifiers

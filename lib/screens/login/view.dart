@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:nurse_assistance/screens/forgot_password/forgot_password.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../dialogs.dart';
 import '../../http_request.dart';
@@ -205,7 +206,30 @@ class _LoginBodyScreenState extends State<LoginBodyScreen>
                           bottomRight: Radius.circular(15.0)),
                     ),
                   ),
-                  verticalSpace(30),
+                  verticalSpace(10),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5.0),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: ((context) =>
+                                const ForgotPasswordScreen()),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Forgot Password?',
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ),
+                  ),
+                  verticalSpace(10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: PrimaryButton(

@@ -20,6 +20,13 @@ class _ViewChartOrderScreenState extends State<ViewChartOrderScreen> {
   bool isLoading = true;
   List<dynamic> data = [];
 
+  List<dynamic> deptData = [
+    {"dept": "Gastroentrology", "value": 1},
+    {"dept": "Gynaecology", "value": 2},
+    {"dept": "Cardiology", "value": 3},
+    {"dept": "Neurology", "value": 4},
+    {"dept": "Pediatrics", "value": 5},
+  ];
   @override
   void initState() {
     getData();
@@ -58,6 +65,17 @@ class _ViewChartOrderScreenState extends State<ViewChartOrderScreen> {
         });
       }
     });
+  }
+
+  String myDept(id) {
+    var depName = deptData
+        .where((element) {
+          return element["value"] == id;
+        })
+        .toList()[0]["dept"]
+        .toString();
+
+    return depName;
   }
 
   Future _refresh() async => setState(() {
@@ -158,6 +176,13 @@ class _ViewChartOrderScreenState extends State<ViewChartOrderScreen> {
                                               Variable.verticalSpace(10),
                                               Text(
                                                 'Rationale: ${data[index]['rationale']}',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13),
+                                              ),
+                                              Variable.verticalSpace(10),
+                                              Text(
+                                                'Order by: Dr. ${data[index]['doctor_name']} (${myDept(Variable.userInfo["department_id"])})',
                                                 style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 13),
