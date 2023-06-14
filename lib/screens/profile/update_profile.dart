@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -174,28 +175,12 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                           Variable.userInfo["image_file"]),
                                     ) as ImageProvider,
                         ),
-                        // Container(
-                        //   width: 50,
-                        //   height: 50,
-                        //   decoration: BoxDecoration(
-                        //       shape: BoxShape.circle,
-                        //       image: DecorationImage(
-                        //           image: !isLoading
-                        //               ? MemoryImage(
-                        //                   const Base64Decoder().convert(
-                        //                       Variable.userInfo["image_file"]),
-                        //                 )
-                        //               : const AssetImage(
-                        //                       "assets/images/profIcon.png")
-                        //                   as ImageProvider,
-                        //           fit: BoxFit.cover)),
-                        // ),
                         Positioned(
                           bottom: 10,
                           right: 0,
                           child: InkWell(
                             onTap: () {
-                              takePhoto(ImageSource.camera);
+                              showBottomSheetCamera();
                             },
                             child: Container(
                               decoration: const BoxDecoration(
@@ -398,6 +383,35 @@ class _UpdateProfileState extends State<UpdateProfile> {
     );
   }
 
+  void showBottomSheetCamera() {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext cont) {
+          return CupertinoActionSheet(
+            actions: [
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  takePhoto(ImageSource.camera);
+                },
+                child: Text('Use Camera'),
+              ),
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  takePhoto(ImageSource.gallery);
+                },
+                child: Text('Upload from files'),
+              ),
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(cont).pop;
+              },
+              child: const Text('Cancel', style: TextStyle(color: Colors.red)),
+            ),
+          );
+        });
+  }
+
   void takePhoto(ImageSource source) async {
     final pickedFile = await _picker.pickImage(
       source: source,
@@ -421,6 +435,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
     } else {
       imageBase64 = null;
     }
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   }
 
   Future<void> register() async {
