@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../dialogs.dart';
-import '../../functions.dart';
 import '../../http_request.dart';
 import '../../messages.dart';
 import '../../routes/routes.dart';
@@ -27,7 +26,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool isShowPassword = false;
   String? userType;
   String? deptId;
-  bool _isDisabled = true;
   final _formKey = GlobalKey<FormState>();
   OutlineInputBorder myinputborder() {
     //return type is OutlineInputBorder

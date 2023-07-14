@@ -393,13 +393,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 onPressed: () {
                   takePhoto(ImageSource.camera);
                 },
-                child: Text('Use Camera'),
+                child: const Text('Use Camera'),
               ),
               CupertinoActionSheetAction(
                 onPressed: () {
                   takePhoto(ImageSource.gallery);
                 },
-                child: Text('Upload from files'),
+                child: const Text('Upload from files'),
               ),
             ],
             cancelButton: CupertinoActionSheetAction(
